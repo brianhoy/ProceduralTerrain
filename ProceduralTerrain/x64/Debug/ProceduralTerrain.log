@@ -1,0 +1,9 @@
+﻿  Game.cpp
+x:\cpp\projects\proceduralterrain\proceduralterrain\game.cpp(8): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+x:\cpp\projects\proceduralterrain\proceduralterrain\game.cpp(29): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+  Generating Code...
+  Compiling...
+  Progam.cpp
+  Generating Code...
+  ProceduralTerrain.vcxproj -> X:\CPP\Projects\ProceduralTerrain\x64\Debug\ProceduralTerrain.exe
+  ProceduralTerrain.vcxproj -> X:\CPP\Projects\ProceduralTerrain\x64\Debug\ProceduralTerrain.pdb (Partial PDB)
