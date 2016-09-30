@@ -1,9 +1,13 @@
-﻿  Game.cpp
+﻿  Scene.cpp
+  Renderer.cpp
+x:\cpp\projects\proceduralterrain\proceduralterrain\renderer.cpp(67): warning C4800: 'int': forcing value to bool 'true' or 'false' (performance warning)
+  Progam.cpp
+  Game.cpp
 x:\cpp\projects\proceduralterrain\proceduralterrain\game.cpp(8): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
 x:\cpp\projects\proceduralterrain\proceduralterrain\game.cpp(29): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
   Generating Code...
-  Compiling...
-  Progam.cpp
-  Generating Code...
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'X:\CPP\Projects\ProceduralTerrain\x64\Debug\vc120.pdb'; linking object as if no debug info
   ProceduralTerrain.vcxproj -> X:\CPP\Projects\ProceduralTerrain\x64\Debug\ProceduralTerrain.exe
   ProceduralTerrain.vcxproj -> X:\CPP\Projects\ProceduralTerrain\x64\Debug\ProceduralTerrain.pdb (Partial PDB)
