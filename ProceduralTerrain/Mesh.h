@@ -1,8 +1,9 @@
 #pragma once
 #include "Geometry.h"
 #include "Material.h"
+#include "Object3D.h"
 
-class Mesh
+class Mesh : public Object3D
 {
 public:
 	Geometry* geometry;

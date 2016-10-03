@@ -19,15 +19,21 @@
     <Filter Include="Header Files\Player">
       <UniqueIdentifier>{d363fbeb-d7c1-4a24-a727-5bab947e1034}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Material">
+      <UniqueIdentifier>{e70bb2da-5593-49c5-b1d1-6ef94b78c155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Shaders">
+      <UniqueIdentifier>{b0a9d333-8bd7-4618-a710-4e18d2e559d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Geometry">
+      <UniqueIdentifier>{27677945-2612-4c2e-b16a-3e550beda0f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Progam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
@@ -71,14 +77,37 @@
     <ClInclude Include="PlaneMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Object3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshBasicMaterial.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Header Files\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Header Files\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaneGeometry.h">
+      <Filter>Header Files\Geometry</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="meshbasic.vert">
+      <Filter>Header Files\Shaders</Filter>
+    </None>
+    <None Include="meshbasic.frag">
+      <Filter>Header Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

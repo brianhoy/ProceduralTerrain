@@ -52,6 +52,10 @@ int Renderer::createWindow(int width, int height)
 
 void Renderer::render(Camera& camera, Scene& scene)
 {
+	for (Mesh& mesh : scene.meshes) {
+		mesh.material->use(); /* use the shader of the mesh */
+
+	}
 	// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 	glfwPollEvents();
 	// Swap the screen buffers
