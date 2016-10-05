@@ -66,4 +66,8 @@ class PlaneGeometry : public Geometry {
 
 		}
 	}
+
+	void update() {
+		
+	}
 };

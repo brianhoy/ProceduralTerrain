@@ -54,8 +54,12 @@ void Renderer::render(Camera& camera, Scene& scene)
 {
 	for (Mesh& mesh : scene.meshes) {
 		mesh.material->use(); /* use the shader of the mesh */
+		glBindVertexArray(mesh.geometry->VAO); /* bind to the geometry of the mesh */
+
 
 	}
+	glBindVertexArray(0); /* unbind any geometry */
+
 	// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 	glfwPollEvents();
 	// Swap the screen buffers
