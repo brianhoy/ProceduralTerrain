@@ -1,12 +1,11 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "Object3D.h"
 
-class Player
+class Player : public Object3D
 {
 public:
-	glm::vec3 position;
-
 	Player(glm::vec3 position);
 	~Player();
 };

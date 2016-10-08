@@ -1,8 +1,7 @@
 #pragma once
 #include "Renderer.h"
 class Material {
-	friend class Renderer;
-
-protected:
+public:
+	GLuint program;
 	virtual void use() = 0;
 };

@@ -126,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Directions.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="InputManager.h" />
@@ -138,13 +139,11 @@
     <ClInclude Include="PlaneGeometry.h" />
     <ClInclude Include="PlaneMesh.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="Renderable.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vertex.h" />
-    <ClInclude Include="WorldObjectRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="meshbasic.frag" />

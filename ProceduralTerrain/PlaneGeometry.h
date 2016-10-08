@@ -7,6 +7,7 @@
 /* adapted from https://github.com/mrdoob/three.js/blob/master/src/geometries/PlaneBufferGeometry.js */
 
 class PlaneGeometry : public Geometry {
+public:
 	unsigned int width;
 	unsigned int height;
 	unsigned int widthSegments;
@@ -14,6 +15,9 @@ class PlaneGeometry : public Geometry {
 
 	PlaneGeometry(unsigned int width, unsigned int height, unsigned int widthSegments, unsigned int heightSegments) : 
 		width(width), height(height), widthSegments(widthSegments), heightSegments(heightSegments) {
+
+		indices = std::vector<GLuint>();
+		vertices = std::vector<Vertex>();
 
 		float width_half = width / 2;
 		float height_half = height / 2;
@@ -65,9 +69,10 @@ class PlaneGeometry : public Geometry {
 			}
 
 		}
+		needsUpdate = true;
 	}
 
 	void update() {
-		
+		needsUpdate = true;
 	}
 };

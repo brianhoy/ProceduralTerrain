@@ -2,7 +2,8 @@
 
 
 
-LocalPlayer::LocalPlayer(glm::vec3 position) : Player(position), camera(Camera(glm::vec3(0.0f, 0.0f, 0.0f)))
+LocalPlayer::LocalPlayer(glm::vec3 position, GLfloat movementSpeed = 10.0) :
+	Player(position), camera(Camera(glm::vec3(0.0f, 0.0f, 0.0f))), movementSpeed(movementSpeed)
 {
 }
 
@@ -39,21 +40,35 @@ void LocalPlayer::mouse_callback(GLFWwindow * window, double xpos, double ypos)
 	lastX = xpos;
 	lastY = ypos;
 
-	camera.ProcessMouseMovement(xoffset, yoffset);
+	processMouse(xoffset, yoffset);
 }
 
 void LocalPlayer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 	camera.ProcessMouseScroll(yoffset);
 }
 
-void LocalPlayer::doMovement(GLfloat deltaTime)
+void LocalPlayer::processMouse(double xoffset, double yoffset) {
+	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+void LocalPlayer::processKeyboard(GLfloat deltaTime) {
+	if (keys[GLFW_KEY_W]) doMovement(FORWARD, deltaTime);
+	if (keys[GLFW_KEY_S]) doMovement(BACKWARD, deltaTime);
+	if (keys[GLFW_KEY_A]) doMovement(LEFT, deltaTime);
+	if (keys[GLFW_KEY_D]) doMovement(RIGHT, deltaTime);
+}
+
+void LocalPlayer::doMovement(Direction direction, GLfloat deltaTime)
 {
-	if (keys[GLFW_KEY_W])
-		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (keys[GLFW_KEY_S])
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (keys[GLFW_KEY_A])
-		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (keys[GLFW_KEY_D])
-		camera.ProcessKeyboard(RIGHT, deltaTime);
+	GLfloat velocity = deltaTime * movementSpeed;
+	switch (direction) {
+	case FORWARD:
+		position += getFront() * velocity;
+	case BACKWARD:
+		position -= getFront() * velocity;
+	case LEFT:
+		position -= getRight() * velocity;
+	case RIGHT:
+		position += getRight() * velocity;
+	}
 }

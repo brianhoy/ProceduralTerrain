@@ -8,8 +8,9 @@ public:
 	Texture* texture;
 	Shader* shader;
 
-	MeshBasicMaterial(Texture* texture, Shader* shader) : texture(texture), shader(shader) {
-
+	MeshBasicMaterial(Texture* texture = NULL, Shader* shader = new Shader("meshbasic.vert", "meshbasic.frag")) : texture(texture), shader(shader) {
+		program = shader->Program;
+		std::cout << "Setting program id to " << program << std::endl;
 	}
 
 	virtual void use() {

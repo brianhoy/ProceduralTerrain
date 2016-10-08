@@ -6,8 +6,8 @@
 
 #include "Camera.h"
 #include "Scene.h"
-#include "Renderer.h"
 #include "InputReceiverInterface.h"
+#include <glm/gtc/type_ptr.hpp>
 
 class Renderer
 {
@@ -15,10 +15,14 @@ public:
 	Renderer();
 	~Renderer();
 	
+	int screenWidth, screenHeight;
+
 	int createWindow(int width, int height);
-	void render(Camera& camera, Scene& scene);
+	void render(Camera* camera, Scene* scene);
 	void terminate();
 	GLFWwindow* window;
 	bool shouldClose();
+private:
+	void uploadGeometry(Geometry* g);
 };
 

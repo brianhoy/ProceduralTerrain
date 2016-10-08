@@ -7,6 +7,11 @@
 
 #include "InputManager.h"
 
+#include "PlaneGeometry.h"
+#include "Mesh.h"
+#include "Texture.h"
+#include "MeshBasicMaterial.h"
+
 // Window dimensions
 
 class Game
@@ -19,6 +24,8 @@ public:
 
 	void start();
 	void loop();
+
+	void addTestMeshes();
 private:
 	Renderer renderer;
 	Camera camera;
