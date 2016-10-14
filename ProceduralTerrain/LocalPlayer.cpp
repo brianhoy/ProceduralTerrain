@@ -2,8 +2,8 @@
 
 
 
-LocalPlayer::LocalPlayer(glm::vec3 position, GLfloat movementSpeed = 10.0) :
-	Player(position), camera(Camera(glm::vec3(0.0f, 0.0f, 0.0f))), movementSpeed(movementSpeed)
+LocalPlayer::LocalPlayer(glm::vec3 position, GLfloat movementSpeed, GLfloat mouseSensitivity) :
+	Player(position), camera(Camera(glm::vec3(0.0f, 0.0f, 0.0f))), movementSpeed(movementSpeed), mouseSensitivity(mouseSensitivity)
 {
 }
 
@@ -44,11 +44,11 @@ void LocalPlayer::mouse_callback(GLFWwindow * window, double xpos, double ypos)
 }
 
 void LocalPlayer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-	camera.ProcessMouseScroll(yoffset);
+	//camera.ProcessMouseScroll(yoffset);
 }
 
 void LocalPlayer::processMouse(double xoffset, double yoffset) {
-	camera.ProcessMouseMovement(xoffset, yoffset);
+	doCameraRotation(xoffset, yoffset);
 }
 
 void LocalPlayer::processKeyboard(GLfloat deltaTime) {
@@ -63,12 +63,25 @@ void LocalPlayer::doMovement(Direction direction, GLfloat deltaTime)
 	GLfloat velocity = deltaTime * movementSpeed;
 	switch (direction) {
 	case FORWARD:
-		position += getFront() * velocity;
+		translate(getFront() * velocity);
 	case BACKWARD:
-		position -= getFront() * velocity;
+		translate(-1.0f * getFront() * velocity);
 	case LEFT:
-		position -= getRight() * velocity;
+		translate(-1.0f * getRight() * velocity);
 	case RIGHT:
-		position += getRight() * velocity;
+		translate(getRight() * velocity);
 	}
+	std::cout << "doing movement, position: " << direction << ", cord: " << position.x << ", " << position.y << ", " << position.z << std::endl;
+}
+
+void LocalPlayer::doCameraRotation(double xdelta, double ydelta) {
+	/*if (this->Pitch > 89.0f)
+		this->Pitch = 89.0f;
+	if (this->Pitch < -89.0f)
+		this->Pitch = -89.0f; */
+	camera.rotate(glm::vec3(ydelta, xdelta, 0.0f));
+}
+
+void LocalPlayer::update(GLfloat delta) {
+	processKeyboard(delta);
 }

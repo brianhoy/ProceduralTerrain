@@ -7,10 +7,12 @@
 
 #include "InputManager.h"
 
+#include "CubeGeometry.h"
 #include "PlaneGeometry.h"
 #include "Mesh.h"
 #include "Texture.h"
 #include "MeshBasicMaterial.h"
+
 
 // Window dimensions
 
@@ -37,5 +39,7 @@ private:
 	GLfloat currentFrame;
 	GLfloat deltaTime;
 	GLfloat lastFrame;
+
+	Mesh* testmesh;
 };
 

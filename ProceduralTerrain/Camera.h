@@ -7,26 +7,14 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "Directions.h"
-
-// Default camera values
-const GLfloat YAW = -90.0f;
-const GLfloat PITCH = 0.0f;
-const GLfloat SPEED = 3.0f;
-const GLfloat SENSITIVTY = 0.25f;
-const GLfloat ZOOM = 45.0f;
-
+#include "Object3D.h"
 
 // An abstract camera class that processes input and calculates the corresponding Eular Angles, Vectors and Matrices for use in OpenGL
 class Camera : public Object3D
 {
 public:
-	GLfloat movementSpeed;
-	GLfloat mouseSensitivity;
-	GLfloat zoom;
-
 	// Constructor with vectors
-	Camera(glm::vec3 position)
+	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f))
 	{
 		this->position = position;
 	}
@@ -35,52 +23,5 @@ public:
 	glm::mat4 GetViewMatrix()
 	{
 		return glm::lookAt(position, position + getFront(), getUp());
-	}
-
-	// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-	void ProcessKeyboard(Direction direction, GLfloat deltaTime)
-	{
-		GLfloat velocity = movementSpeed * deltaTime;
-		if (direction == FORWARD)
-			this->Position += this->Front * velocity;
-		if (direction == BACKWARD)
-			this->Position -= this->Front * velocity;
-		if (direction == LEFT)
-			this->Position -= this->Right * velocity;
-		if (direction == RIGHT)
-			this->Position += this->Right * velocity;
-	}
-
-	// Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-	void ProcessMouseMovement(GLfloat xoffset, GLfloat yoffset, GLboolean constrainPitch = true)
-	{
-		xoffset *= this->MouseSensitivity;
-		yoffset *= this->MouseSensitivity;
-
-		this->Yaw += xoffset;
-		this->Pitch += yoffset;
-
-		// Make sure that when pitch is out of bounds, screen doesn't get flipped
-		if (constrainPitch)
-		{
-			if (this->Pitch > 89.0f)
-				this->Pitch = 89.0f;
-			if (this->Pitch < -89.0f)
-				this->Pitch = -89.0f;
-		}
-
-		// Update Front, Right and Up Vectors using the updated Eular angles
-		this->updateCameraVectors();
-	}
-
-	// Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-	void ProcessMouseScroll(GLfloat yoffset)
-	{
-		if (this->Zoom >= 1.0f && this->Zoom <= 45.0f)
-			this->Zoom -= yoffset;
-		if (this->Zoom <= 1.0f)
-			this->Zoom = 1.0f;
-		if (this->Zoom >= 45.0f)
-			this->Zoom = 45.0f;
 	}
 };

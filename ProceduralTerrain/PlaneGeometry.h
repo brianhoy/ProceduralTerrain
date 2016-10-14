@@ -19,17 +19,17 @@ public:
 		indices = std::vector<GLuint>();
 		vertices = std::vector<Vertex>();
 
-		float width_half = width / 2;
-		float height_half = height / 2;
+		float width_half = (float)width / 2.0f;
+		float height_half = (float)height / 2.0f;
 
-		float gridX = std::floor(widthSegments) || 1;
-		float gridY = std::floor(heightSegments) || 1;
+		float gridX = std::floor(widthSegments);
+		float gridY = std::floor(heightSegments);
 
 		float gridX1 = gridX + 1;
 		float gridY1 = gridY + 1;
 
-		float segment_width = width / gridX;
-		float segment_height = height / gridY;
+		float segment_width = (float)width / gridX;
+		float segment_height = (float)height / gridY;
 
 		for (int iy = 0; iy < gridY1; iy++) {
 
@@ -41,9 +41,9 @@ public:
 
 				Vertex v = Vertex();
 
-				v.Position = glm::vec3(x, -y, 1.0f);
-				v.TexCoords = glm::vec2(ix / gridX, 1 - (iy / gridY));
-				v.Normal = glm::vec3(0.0f, 0.0f, 1.0f); /* +1 in z direction is perpendicular to plane */
+				v.position = glm::vec3(x, -y, 1.0f);
+				v.texCoords = glm::vec2(ix / gridX, 1 - (iy / gridY));
+				v.normal = glm::vec3(0.0f, 0.0f, 1.0f); /* +1 in z direction is perpendicular to plane */
 				
 				vertices.push_back(v);
 			}

@@ -57,7 +57,7 @@ void Renderer::render(Camera* camera, Scene* scene)
 	glm::mat4 view;
 	view = camera->GetViewMatrix();
 	glm::mat4 projection;
-	projection = glm::perspective(camera->Zoom, (float)screenWidth / (float)screenHeight, 0.1f, 1000.0f);
+	projection = glm::perspective(1.0f, (float)screenWidth / (float)screenHeight, 0.1f, 1000.0f);
 
 	for (int i = 0; i < scene->meshes.size(); i++) {
 		Mesh* mesh = scene->meshes.at(i);
@@ -72,6 +72,8 @@ void Renderer::render(Camera* camera, Scene* scene)
 		GLint modelLoc = glGetUniformLocation(mesh->material->program, "model");
 		GLint viewLoc = glGetUniformLocation(mesh->material->program, "view");
 		GLint projLoc = glGetUniformLocation(mesh->material->program, "projection");
+
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mesh->getModelMatrix()));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 

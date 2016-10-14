@@ -21,11 +21,14 @@ Game::~Game()
 
 void Game::addTestMeshes() {
 	PlaneGeometry* geometry = new PlaneGeometry(100, 100, 10, 10);
-	MeshBasicMaterial* mat = new MeshBasicMaterial();
-	Mesh* mesh = new Mesh(geometry, mat);
-	std::cout << "mesh indices size" << mesh->geometry->indices.size() << std::endl;
+	CubeGeometry* cubeGeometry = new CubeGeometry();
 
-	scene.add(mesh);
+	MeshBasicMaterial* mat = new MeshBasicMaterial();
+	testmesh = new Mesh(cubeGeometry, mat);
+	std::cout << "mesh indices size" << testmesh->geometry->indices.size() << std::endl;
+
+	//testmesh->setScale(glm::vec3(1000.0f, 1000.0f, 1000.0f));
+	scene.add(testmesh);
 
 }
 
@@ -42,11 +45,13 @@ void Game::loop() {
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 
-	player.doMovement(deltaTime);
+	player.update(deltaTime);
+	testmesh->rotate(glm::vec3(deltaTime, deltaTime, deltaTime));
 
-	std::cout << "plaeyr position x: " << player.position.x << std::endl;
-	std::cout << "plaeyr position y: " << player.position.y << std::endl;
-	std::cout << "plaeyr position z: " << player.position.z << std::endl;
+	glm::vec3 ang = player.camera.getEulerAngles();
 
-	renderer.render(&camera, &scene);
+	//std::cout << "player position xyz: " << player.getPosition().x << player.getPosition().y << player.getPosition().z << std::endl;
+	//std::cout << "Pitch: " << ang.x << "Yaw: " << ang.y << "Roll: " << ang.z << std::endl;
+
+	renderer.render(&player.camera, &scene);
 }

@@ -107,6 +107,9 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files\Player</Filter>
     </ClInclude>
+    <ClInclude Include="CubeGeometry.h">
+      <Filter>Header Files\Geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="meshbasic.vert">
