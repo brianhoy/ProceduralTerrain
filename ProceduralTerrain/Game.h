@@ -24,6 +24,8 @@ public:
 
 	const GLuint WIDTH = 800, HEIGHT = 600;
 
+	glm::vec3 lastCamera = glm::vec3(0.0f, 0.0f, 0.0f) , lastPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+
 	void start();
 	void loop();
 

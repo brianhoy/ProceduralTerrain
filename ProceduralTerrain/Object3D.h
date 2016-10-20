@@ -1,4 +1,7 @@
 #pragma once
+
+#include <iostream>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -7,10 +10,9 @@ class Object3D {
 protected:
 	glm::vec3 position;
 	glm::quat quaternion;
-	glm::vec3 eulerRotation; /* Write-only within this class */
 	glm::vec3 scale;
 
-	glm::mat4* parentMatrix;
+	Object3D* parent = nullptr;
 	glm::mat4 translationMatrix;
 	glm::mat4 rotationMatrix;
 	glm::mat4 scaleMatrix;
@@ -21,11 +23,11 @@ protected:
 		return glm::vec3(calc.x, calc.y, calc.z);
 	}
 	void updateMatrix() {
-		if (parentMatrix != NULL) {
-			modelMatrix = *parentMatrix * translationMatrix * rotationMatrix * scaleMatrix;
+		if (parent != nullptr) {
+			modelMatrix = parent->getModelMatrix() * translationMatrix * rotationMatrix * scaleMatrix;
 		}
 		else {
-			modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+			modelMatrix = rotationMatrix * translationMatrix * scaleMatrix;
 		}
 	}
 	void updateRotationMatrix() {
@@ -34,13 +36,12 @@ protected:
 
 public:
 	Object3D() {
-		quaternion = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-		eulerRotation = glm::vec3(0.0f, 0.0f, 0.0f);
+		quaternion = glm::quat();
 		position = glm::vec3(0.0f, 0.0f, 0.0f);
 		scale = glm::vec3(0.0f, 0.0f, 0.0f);
 
 		translationMatrix = glm::mat4();
-		rotationMatrix = glm::mat4();
+		rotationMatrix = glm::mat4(quaternion);
 		scaleMatrix = glm::mat4();
 
 		updateMatrix();
@@ -59,27 +60,32 @@ public:
 		return modelMatrix;
 	}
 	glm::vec3 getPosition() {
-		return position;
+		if (parent == nullptr) return position;
+		return position + parent->getPosition();
 	}
+	glm::quat getQuaternion() {
+		if (parent == nullptr) return quaternion;
+		return quaternion + parent->getQuaternion();
+	}
+
 	glm::vec3 getEulerAngles() {
-		return eulerRotation;
+		glm::vec3 euler = glm::eulerAngles(getQuaternion());
+		return glm::vec3(glm::degrees(euler.x), glm::degrees(euler.y), glm::degrees(euler.z));
 	}
 
 	void add(Object3D& obj) {
-		obj.parentMatrix = &modelMatrix;
+		if (&obj == this) return;
+		obj.parent = this;
 	}
 	void rotate(float angle, glm::vec3& axis) {
 		quaternion *= glm::angleAxis(angle, axis);
-		eulerRotation = glm::eulerAngles(quaternion);
 		updateRotationMatrix();
 		updateMatrix();
 	}
 	void rotate(glm::vec3& eulerAngles) {
-		quaternion *= glm::angleAxis(eulerAngles.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		quaternion *= glm::angleAxis(eulerAngles.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		quaternion *= glm::angleAxis(eulerAngles.z, glm::vec3(0.0f, 0.0f, 1.0f));
-		rotationMatrix *= glm::mat4(quaternion);
-		eulerRotation = glm::eulerAngles(quaternion);
+		quaternion = glm::angleAxis(glm::radians(eulerAngles.x), glm::vec3(1.0f, 0.0f, 0.0f)) * quaternion;
+		quaternion = glm::angleAxis(glm::radians(eulerAngles.y), glm::vec3(0.0f, 1.0f, 0.0f)) * quaternion;
+		quaternion = glm::angleAxis(glm::radians(eulerAngles.z), glm::vec3(0.0f, 0.0f, 1.0f)) * quaternion;
 
 		updateRotationMatrix();
 		updateMatrix();
@@ -93,7 +99,6 @@ public:
 	}
 	void setAngles(glm::quat quaternion_) {
 		quaternion = quaternion_;
-		eulerRotation = glm::eulerAngles(quaternion);
 
 		updateRotationMatrix();
 		updateMatrix();
@@ -105,8 +110,11 @@ public:
 		updateMatrix();
 	}
 	void translate(glm::vec3& translation) {
+		std::cout << "translation: (" << translation.x << ", " << translation.y << ", " << translation.z << ")" << std::endl;
+
 		position += translation;
 		translationMatrix = glm::translate(translationMatrix, translation);
+		//setPosition(position);
 
 		updateMatrix();
 	}

@@ -54,10 +54,18 @@ int Renderer::createWindow(int width, int height)
 
 void Renderer::render(Camera* camera, Scene* scene)
 {
+	// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
+	glfwPollEvents();
+
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glm::mat4 view;
-	view = camera->GetViewMatrix();
+	view = camera->GetViewMatrix(); //glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); //
 	glm::mat4 projection;
-	projection = glm::perspective(1.0f, (float)screenWidth / (float)screenHeight, 0.1f, 1000.0f);
+	projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f, 100.0f); //glm::perspective(1.0f, (float)screenWidth / (float)screenHeight, 0.1f, 1000.0f);
+	//glm::mat4 model;
+	//model = glm::rotate(model, -55.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	for (int i = 0; i < scene->meshes.size(); i++) {
 		Mesh* mesh = scene->meshes.at(i);
@@ -78,13 +86,14 @@ void Renderer::render(Camera* camera, Scene* scene)
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		glBindVertexArray(mesh->geometry->VAO); /* bind to the geometry of the mesh */
-		glDrawElements(GL_TRIANGLES, mesh->geometry->indices.size(), GL_UNSIGNED_INT, 0);
-
+		if (mesh->geometry->indices.size() == 0) {
+			glDrawArrays(GL_TRIANGLES, 0, mesh->geometry->vertices.size());
+		}
+		else {
+			glDrawElements(GL_TRIANGLES, mesh->geometry->indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
+		}
+		glBindVertexArray(0); /* unbind any geometry */
 	}
-	glBindVertexArray(0); /* unbind any geometry */
-
-	// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
-	glfwPollEvents();
 	// Swap the screen buffers
 	glfwSwapBuffers(window);
 }
@@ -106,13 +115,16 @@ void Renderer::uploadGeometry(Geometry* g) {
 	glBindVertexArray(g->VAO);
 		// 2. Copy our vertices array in a buffer for OpenGL to use
 		glBindBuffer(GL_ARRAY_BUFFER, g->VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(g->vertices), &g->vertices, GL_STATIC_DRAW);
-		// 2.5 upload indices
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g->EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g->indices), &g->indices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, g->vertices.size() * sizeof(Vertex), &g->vertices[0], GL_STATIC_DRAW);
+
+		// 2.5 Upload indices if they exist
+		if (g->indices.size() > 0) {
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g->EBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, g->indices.size() * sizeof(GLuint), &g->indices[0], GL_STATIC_DRAW);
+		}
 
 		// 3. Then set our vertex attributes pointers
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
 		//4. Unbind the VAO
 	glBindVertexArray(0);

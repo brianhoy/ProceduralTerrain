@@ -20,11 +20,12 @@ Game::~Game()
 }
 
 void Game::addTestMeshes() {
-	PlaneGeometry* geometry = new PlaneGeometry(100, 100, 10, 10);
-	CubeGeometry* cubeGeometry = new CubeGeometry();
+	PlaneGeometry* geometry = new PlaneGeometry(1, 1, 10, 10);
+	//CubeGeometry* cubeGeometry = new CubeGeometry();
 
 	MeshBasicMaterial* mat = new MeshBasicMaterial();
-	testmesh = new Mesh(cubeGeometry, mat);
+	//testmesh = new Mesh(cubeGeometry, mat);
+	testmesh = new Mesh(geometry, mat);
 	std::cout << "mesh indices size" << testmesh->geometry->indices.size() << std::endl;
 
 	//testmesh->setScale(glm::vec3(1000.0f, 1000.0f, 1000.0f));
@@ -46,12 +47,19 @@ void Game::loop() {
 	lastFrame = currentFrame;
 
 	player.update(deltaTime);
-	testmesh->rotate(glm::vec3(deltaTime, deltaTime, deltaTime));
+	//testmesh->rotate(glm::vec3(deltaTime, deltaTime, deltaTime));
 
 	glm::vec3 ang = player.camera.getEulerAngles();
+	glm::vec3 pos = player.getPosition();
 
-	//std::cout << "player position xyz: " << player.getPosition().x << player.getPosition().y << player.getPosition().z << std::endl;
-	//std::cout << "Pitch: " << ang.x << "Yaw: " << ang.y << "Roll: " << ang.z << std::endl;
+	if (pos != lastPosition) {
+		std::cout << "Player Position xyz: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
+		lastPosition = pos;
+	}
+	if (ang != lastCamera) {
+		std::cout << "Camera Pitch: " << ang.x << ", Yaw: " << ang.y << ", Roll: " << ang.z << std::endl;
+		lastCamera = ang;
+	}
 
 	renderer.render(&player.camera, &scene);
 }

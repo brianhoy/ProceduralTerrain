@@ -5,6 +5,7 @@
 LocalPlayer::LocalPlayer(glm::vec3 position, GLfloat movementSpeed, GLfloat mouseSensitivity) :
 	Player(position), camera(Camera(glm::vec3(0.0f, 0.0f, 0.0f))), movementSpeed(movementSpeed), mouseSensitivity(mouseSensitivity)
 {
+	add(camera);
 }
 
 
@@ -60,26 +61,41 @@ void LocalPlayer::processKeyboard(GLfloat deltaTime) {
 
 void LocalPlayer::doMovement(Direction direction, GLfloat deltaTime)
 {
+
+	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
+
 	GLfloat velocity = deltaTime * movementSpeed;
-	switch (direction) {
-	case FORWARD:
-		translate(getFront() * velocity);
-	case BACKWARD:
-		translate(-1.0f * getFront() * velocity);
-	case LEFT:
-		translate(-1.0f * getRight() * velocity);
-	case RIGHT:
-		translate(getRight() * velocity);
-	}
+	if(direction == FORWARD)
+		translate(front * velocity);
+	if (direction == BACKWARD)
+		translate(-1.0f * front * velocity);
+	if (direction == LEFT)
+		translate(-1.0f * right * velocity);
+	if (direction == RIGHT)
+		translate(right * velocity);
+
 	std::cout << "doing movement, position: " << direction << ", cord: " << position.x << ", " << position.y << ", " << position.z << std::endl;
 }
 
 void LocalPlayer::doCameraRotation(double xdelta, double ydelta) {
-	/*if (this->Pitch > 89.0f)
-		this->Pitch = 89.0f;
-	if (this->Pitch < -89.0f)
-		this->Pitch = -89.0f; */
-	camera.rotate(glm::vec3(ydelta, xdelta, 0.0f));
+	/*eulerCameraAngles.x += ydelta * mouseSensitivity;
+	eulerCameraAngles.y += xdelta * mouseSensitivity;
+	eulerCameraAngles.z = 0.0f;
+
+	if (eulerCameraAngles.x > 89.0f) eulerCameraAngles.x = 90.0f;
+	if (eulerCameraAngles.x < -89.0f) eulerCameraAngles.x = -90.f;
+
+	glm::quat qPitch = glm::angleAxis(eulerCameraAngles.x, glm::vec3(1, 0, 0));
+	glm::quat qYaw = glm::angleAxis(eulerCameraAngles.y, glm::vec3(0, 1, 0));
+	glm::quat qRoll = glm::angleAxis(eulerCameraAngles.z, glm::vec3(0, 0, 1));
+
+	glm::quat orientation = qPitch * qYaw;
+	orientation = glm::normalize(orientation);
+
+	orientation = glm::quat(glm::vec3(glm::radians(eulerCameraAngles.x), glm::radians(eulerCameraAngles.y), 0.0f));*/
+
+	camera.rotate(ydelta * mouseSensitivity, glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
 void LocalPlayer::update(GLfloat delta) {

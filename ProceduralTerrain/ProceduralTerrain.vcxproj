@@ -136,6 +136,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshBasicMaterial.h" />
+    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Object3D.h" />
     <ClInclude Include="PlaneGeometry.h" />
     <ClInclude Include="PlaneMesh.h" />
