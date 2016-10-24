@@ -36,7 +36,7 @@ void LocalPlayer::mouse_callback(GLFWwindow * window, double xpos, double ypos)
 	}
 
 	GLfloat xoffset = xpos - lastX;
-	GLfloat yoffset = lastY - ypos;  // Reversed since y-coordinates go from bottom to left
+	GLfloat yoffset = ypos - lastY; 
 
 	lastX = xpos;
 	lastY = ypos;
@@ -62,8 +62,8 @@ void LocalPlayer::processKeyboard(GLfloat deltaTime) {
 void LocalPlayer::doMovement(Direction direction, GLfloat deltaTime)
 {
 
-	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
-	glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 right = getRight(); //glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 front = getFront(); //glm::vec3(0.0f, 0.0f, -1.0f);
 
 	GLfloat velocity = deltaTime * movementSpeed;
 	if(direction == FORWARD)
@@ -79,25 +79,16 @@ void LocalPlayer::doMovement(Direction direction, GLfloat deltaTime)
 }
 
 void LocalPlayer::doCameraRotation(double xdelta, double ydelta) {
-	/*eulerCameraAngles.x += ydelta * mouseSensitivity;
-	eulerCameraAngles.y += xdelta * mouseSensitivity;
-	eulerCameraAngles.z = 0.0f;
+	if ((camera.getEulerAngles().x > 90.0f && ydelta > 0.0f) || (camera.getEulerAngles().x < -90.0f && ydelta < 0.0f)) {
+		//ydelta = 0;
+	}
 
-	if (eulerCameraAngles.x > 89.0f) eulerCameraAngles.x = 90.0f;
-	if (eulerCameraAngles.x < -89.0f) eulerCameraAngles.x = -90.f;
-
-	glm::quat qPitch = glm::angleAxis(eulerCameraAngles.x, glm::vec3(1, 0, 0));
-	glm::quat qYaw = glm::angleAxis(eulerCameraAngles.y, glm::vec3(0, 1, 0));
-	glm::quat qRoll = glm::angleAxis(eulerCameraAngles.z, glm::vec3(0, 0, 1));
-
-	glm::quat orientation = qPitch * qYaw;
-	orientation = glm::normalize(orientation);
-
-	orientation = glm::quat(glm::vec3(glm::radians(eulerCameraAngles.x), glm::radians(eulerCameraAngles.y), 0.0f));*/
-
-	camera.rotate(ydelta * mouseSensitivity, glm::vec3(1.0f, 0.0f, 0.0f));
+	rotate(glm::vec3(0.0f, xdelta * mouseSensitivity, 0.0f));
+	
+	camera.rotate(glm::vec3(-ydelta * mouseSensitivity, 0.0f, 0.0f));
 }
 
 void LocalPlayer::update(GLfloat delta) {
 	processKeyboard(delta);
+	updateMatrix();
 }

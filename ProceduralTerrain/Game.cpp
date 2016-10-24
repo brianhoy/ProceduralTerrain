@@ -54,12 +54,26 @@ void Game::loop() {
 
 	if (pos != lastPosition) {
 		std::cout << "Player Position xyz: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
+		glm::vec3 pos2 = player.camera.getPosition();
+		std::cout << "Camera Position xyz: " << pos2.x << ", " << pos2.y << ", " << pos2.z << std::endl;
+		pos2 = player.camera.getFront();
+		std::cout << "Camera Front: " << pos2.x << ", " << pos2.y << ", " << pos2.z << std::endl;
+		pos2 = player.camera.getUp();
+		std::cout << "Camera Up: " << pos2.x << ", " << pos2.y << ", " << pos2.z << std::endl;
 		lastPosition = pos;
 	}
 	if (ang != lastCamera) {
 		std::cout << "Camera Pitch: " << ang.x << ", Yaw: " << ang.y << ", Roll: " << ang.z << std::endl;
+		glm::vec3 pos2 = player.camera.getPosition();
+		std::cout << "Camera Position xyz: " << pos2.x << ", " << pos2.y << ", " << pos2.z << std::endl;
+		pos2 = player.camera.getFront();
+		std::cout << "Camera Front: " << pos2.x << ", " << pos2.y << ", " << pos2.z << std::endl;
+		pos2 = player.camera.getUp();
+		std::cout << "Camera Up: " << pos2.x << ", " << pos2.y << ", " << pos2.z << std::endl;
 		lastCamera = ang;
 	}
+
+	//player.update();
 
 	renderer.render(&player.camera, &scene);
 }

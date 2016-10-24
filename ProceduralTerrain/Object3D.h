@@ -24,7 +24,7 @@ protected:
 	}
 	void updateMatrix() {
 		if (parent != nullptr) {
-			modelMatrix = parent->getModelMatrix() * translationMatrix * rotationMatrix * scaleMatrix;
+			modelMatrix =  rotationMatrix * translationMatrix * parent->getModelMatrix() * scaleMatrix;
 		}
 		else {
 			modelMatrix = rotationMatrix * translationMatrix * scaleMatrix;
@@ -48,13 +48,14 @@ public:
 	}
 
 	glm::vec3 getFront() {
-		return multiplyVector(glm::vec3(0.0f, 0.0f, -1.0f));
+		return glm::normalize(glm::vec3(modelMatrix[0].z, modelMatrix[1].z, modelMatrix[2].z));
 	}
 	glm::vec3 getRight() {
-		return multiplyVector(glm::vec3(1.0f, 0.0f, 0.0f));
+		//return glm::normalize(glm::cross(, cameraDirection));
+		return glm::normalize(glm::vec3(modelMatrix[0].x, modelMatrix[1].x, modelMatrix[2].x));
 	}	
 	glm::vec3 getUp() {
-		return multiplyVector(glm::vec3(0.0f, 1.0f, 0.0f));
+		return glm::normalize(glm::vec3(modelMatrix[0].y, modelMatrix[1].y, modelMatrix[2].y));
 	}
 	glm::mat4 getModelMatrix() {
 		return modelMatrix;
@@ -113,8 +114,8 @@ public:
 		std::cout << "translation: (" << translation.x << ", " << translation.y << ", " << translation.z << ")" << std::endl;
 
 		position += translation;
-		translationMatrix = glm::translate(translationMatrix, translation);
-		//setPosition(position);
+		//translationMatrix = glm::translate(translationMatrix, translation);
+		setPosition(position);
 
 		updateMatrix();
 	}

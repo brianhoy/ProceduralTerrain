@@ -8,7 +8,9 @@ class InputManager
 private:
 	GLFWwindow* window;
 public:
-	InputManager(GLFWwindow* window) : window(window) { }
+	InputManager(GLFWwindow* window) : window(window) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
 	void setReceiver(InputReceiverInterface* receiver) {
 		this->receiver = receiver;
 

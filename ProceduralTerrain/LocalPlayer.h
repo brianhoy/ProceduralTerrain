@@ -12,7 +12,7 @@ public:
 	Camera camera;
 
 	LocalPlayer(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), 
-		GLfloat movementSpeed = 10.0, GLfloat mouseSensitivity = 0.05f);
+		GLfloat movementSpeed = 10.0, GLfloat mouseSensitivity = 0.5f);
 	~LocalPlayer();
 
 	virtual void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);

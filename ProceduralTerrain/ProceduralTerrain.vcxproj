@@ -123,6 +123,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Progam.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="TerrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -144,6 +145,8 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="TerrainGenerator.h" />
+    <ClInclude Include="TerrainGeometry.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
