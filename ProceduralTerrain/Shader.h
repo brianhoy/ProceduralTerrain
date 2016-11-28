@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <vector>
 
 #include <GL/glew.h>
 
@@ -10,6 +11,7 @@ class Shader
 {
 public:
 	GLuint Program;
+
 	// Constructor generates the shader on the fly
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
 	{
@@ -92,4 +94,5 @@ public:
 	{
 		glUseProgram(this->Program);
 	}
+private:
 };

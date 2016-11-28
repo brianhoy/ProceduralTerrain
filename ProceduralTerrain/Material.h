@@ -1,7 +1,17 @@
 #pragma once
-#include "Renderer.h"
+#include "Attribute.h"
+#include "Uniform.h"
+#include <vector>
+
+using namespace PT;
+
+namespace PT {
+
 class Material {
 public:
-	GLuint program;
-	virtual void use() = 0;
+	virtual void get() = 0;
+
+	std::vector<Uniform> uniforms = std::vector<Uniform>();
 };
+
+}

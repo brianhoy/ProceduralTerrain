@@ -126,7 +126,10 @@
     <ClCompile Include="TerrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Any.h" />
+    <ClInclude Include="Attribute.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="CubeGeometry.h" />
     <ClInclude Include="Directions.h" />
     <ClInclude Include="Game.h" />
@@ -145,9 +148,10 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainGenerator.h" />
-    <ClInclude Include="TerrainGeometry.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Uniform.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

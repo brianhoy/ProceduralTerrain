@@ -5,6 +5,7 @@
 
 class MeshBasicMaterial : public Material {
 public:
+	GLuint program;
 	Texture* texture;
 	Shader* shader;
 

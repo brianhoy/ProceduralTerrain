@@ -17,7 +17,7 @@ public:
 		width(width), height(height), widthSegments(widthSegments), heightSegments(heightSegments) {
 
 		indices = std::vector<GLuint>();
-		vertices = std::vector<Vertex>();
+		vertexData = std::vector<Vertex>();
 
 		float width_half = (float)width / 2.0f;
 		float height_half = (float)height / 2.0f;
@@ -45,7 +45,7 @@ public:
 				v.texCoords = glm::vec2(ix / gridX, 1 - (iy / gridY));
 				v.normal = glm::vec3(0.0f, 0.0f, 1.0f); /* +1 in z direction is perpendicular to plane */
 				
-				vertices.push_back(v);
+				vertexData.push_back(v);
 			}
 
 		}

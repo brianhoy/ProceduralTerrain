@@ -23,6 +23,8 @@ public:
 	GLFWwindow* window;
 	bool shouldClose();
 private:
-	void uploadGeometry(Geometry* g);
-};
+	void uploadMesh(Mesh& mesh);
+	GLuint uploadShader(const char* code, unsigned int type);
+	GLuint createProgram(std::vector<GLuint> shaders);
 
+};

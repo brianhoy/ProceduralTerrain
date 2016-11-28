@@ -55,7 +55,7 @@ public:
 		vertices.push_back(Vertex(glm::vec3(1.0, -1.0, 1.0)));
 		vertices.push_back(Vertex(glm::vec3(-1.0, -1.0, 1.0))); */
 
-		vertices = {
+		vertexData = {
 			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f)),
 			Vertex(glm::vec3(0.5f, -0.5f, -0.5f)),
 			Vertex(glm::vec3(0.5f, 0.5f, -0.5f)),

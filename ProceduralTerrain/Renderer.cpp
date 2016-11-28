@@ -72,7 +72,7 @@ void Renderer::render(Camera* camera, Scene* scene)
 
 		if (mesh->geometry->needsUpdate) {
 			std::cout << "uploading geometry" << mesh->material->program << std::endl;
-			uploadGeometry(mesh->geometry);
+			uploadMesh(*mesh);
 		}
 
 		mesh->material->use(); /* use the shader of the mesh */
@@ -87,7 +87,7 @@ void Renderer::render(Camera* camera, Scene* scene)
 
 		glBindVertexArray(mesh->geometry->VAO); /* bind to the geometry of the mesh */
 		if (mesh->geometry->indices.size() == 0) {
-			glDrawArrays(GL_TRIANGLES, 0, mesh->geometry->vertices.size());
+			glDrawArrays(GL_TRIANGLES, 0, mesh->geometry->vertexData.size());
 		}
 		else {
 			glDrawElements(GL_TRIANGLES, mesh->geometry->indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
@@ -107,20 +107,28 @@ bool Renderer::shouldClose()
 	return glfwWindowShouldClose(window);
 }
 
-void Renderer::uploadGeometry(Geometry* g) {
-	glGenVertexArrays(1, &g->VAO);
-	glGenBuffers(1, &g->VBO);
-	glGenBuffers(1, &g->EBO);
+void Renderer::uploadMesh(Mesh& mesh) {
+	auto geometry = mesh.geometry;
+	auto material = mesh.material;
+	
+	glGenVertexArrays(1, &geometry->VAO);
+	glGenBuffers(1, &geometry->VBO);
+	glGenBuffers(1, &geometry->EBO);
 
-	glBindVertexArray(g->VAO);
-		// 2. Copy our vertices array in a buffer for OpenGL to use
-		glBindBuffer(GL_ARRAY_BUFFER, g->VBO);
-		glBufferData(GL_ARRAY_BUFFER, g->vertices.size() * sizeof(Vertex), &g->vertices[0], GL_STATIC_DRAW);
+	glBindVertexArray(geometry->VAO);
+		// 2. Copy geometry vertex data into a vertex buffer object
+		glBindBuffer(GL_ARRAY_BUFFER, geometry->VBO);
+		glBufferData(GL_ARRAY_BUFFER, geometry->vertexData.size() * sizeof(Vertex), &geometry->vertexData[0], GL_STATIC_DRAW);
 
-		// 2.5 Upload indices if they exist
-		if (g->indices.size() > 0) {
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g->EBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, g->indices.size() * sizeof(GLuint), &g->indices[0], GL_STATIC_DRAW);
+		// 2.1 Copy each other attribute into a buffer
+		for (int i = 0; i < material->attributes.size(); i++) {
+			glBufferData(GL_ARRAY_BUFFER, material->attributes.at(i).size, material->attributes.at(i).location, GL_STATIC_DRAW);
+		}
+
+		// 2.2 Upload indices if they exist
+		if (geometry->indices.size() > 0) {
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->EBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, geometry->indices.size() * sizeof(GLuint), &geometry->indices[0], GL_STATIC_DRAW);
 		}
 
 		// 3. Then set our vertex attributes pointers
@@ -128,5 +136,27 @@ void Renderer::uploadGeometry(Geometry* g) {
 		glEnableVertexAttribArray(0);
 		//4. Unbind the VAO
 	glBindVertexArray(0);
-	g->needsUpdate = false;
+	geometry->needsUpdate = false;
+}
+
+GLuint Renderer::uploadShader(const char* code, unsigned int type)
+{
+	GLuint id = glCreateShader(type);
+	GLint success;
+	GLchar infoLog[512];
+	glShaderSource(id, 1, &code, NULL);
+	glCompileShader(id);
+	// Print compile errors if any
+	glGetShaderiv(id, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(id, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
+
+}
+
+GLuint Renderer::createProgram(std::vector<GLuint> shaders)
+{
+	return GLuint();
 }

@@ -34,6 +34,12 @@
     <Filter Include="Header Files\Terrain">
       <UniqueIdentifier>{a109ca2b-9f04-493a-9cb9-9ea9c2322bba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Mesh">
+      <UniqueIdentifier>{0dc0c671-3cc9-4ce2-a4e1-f5890ccdd9ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility">
+      <UniqueIdentifier>{1016b39a-ecfc-469c-938c-5d282fff6012}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Progam.cpp">
@@ -57,9 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
@@ -122,8 +125,23 @@
     <ClInclude Include="TerrainGenerator.h">
       <Filter>Header Files\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="TerrainGeometry.h">
+    <ClInclude Include="Terrain.h">
       <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Attribute.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Any.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Uniform.h">
+      <Filter>Header Files\Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
