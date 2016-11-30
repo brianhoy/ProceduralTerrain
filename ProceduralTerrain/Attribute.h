@@ -11,7 +11,7 @@ class Attribute {
 	}
 
 	PT::AttributeType type;
-	PT::any data;
+	PT::any data; //vec of GLint/GLfloat...
 	int size;
 	int itemSize;
 	std::string 

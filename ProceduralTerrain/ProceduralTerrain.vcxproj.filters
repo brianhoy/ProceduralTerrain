@@ -140,9 +140,6 @@
     <ClInclude Include="Any.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Uniform.h">
-      <Filter>Header Files\Material</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="meshbasic.vert">
