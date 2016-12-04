@@ -20,15 +20,22 @@ Game::~Game()
 }
 
 void Game::addTestMeshes() {
-	PlaneGeometry* geometry = new PlaneGeometry(1, 1, 10, 10);
-	//CubeGeometry* cubeGeometry = new CubeGeometry();
+	PlaneGeometry* planeGeometry = new PlaneGeometry(1, 1, 10, 10);
+	CubeGeometry* cubeGeometry = new CubeGeometry();
 
-	MeshBasicMaterial* mat = new MeshBasicMaterial();
-	//testmesh = new Mesh(cubeGeometry, mat);
-	testmesh = new Mesh(geometry, mat);
-	std::cout << "mesh indices size" << testmesh->geometry->indices.size() << std::endl;
+	Texture* tex = new Texture("../Content/container.jpg");
+	MaterialBasic* mat = new MaterialBasic(tex);
+
+	testmesh = new Mesh(planeGeometry, mat);
+	Mesh* testmesh2 = new Mesh(cubeGeometry, mat);
+
+	//std::cout << "mesh indices size" << testmesh->geometry->indices.size() << std::endl;
 
 	//testmesh->setScale(glm::vec3(1000.0f, 1000.0f, 1000.0f));
+
+	testmesh->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
+
+	scene.add(testmesh2);
 	scene.add(testmesh);
 
 }

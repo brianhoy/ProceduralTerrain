@@ -1,14 +1,13 @@
 #pragma once
-#include "Attribute.h"
 #include <vector>
-
-using namespace PT;
-
-namespace PT {
+#include <string>
 
 class Material {
 public:
-	virtual void get() = 0;
-};
+	GLuint program;
+	virtual std::string getType() = 0;
 
-}
+	bool needsUpdate = true;
+	GLuint uboPerMaterial;
+
+};

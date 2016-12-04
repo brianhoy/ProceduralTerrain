@@ -11,7 +11,7 @@
 #include "PlaneGeometry.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "MeshBasicMaterial.h"
+#include "MaterialBasic.h"
 
 
 // Window dimensions

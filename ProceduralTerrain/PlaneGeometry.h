@@ -42,7 +42,7 @@ public:
 				Vertex v = Vertex();
 
 				v.position = glm::vec3(x, -y, 1.0f);
-				v.texCoords = glm::vec2(ix / gridX, 1 - (iy / gridY));
+				v.texCoords = glm::vec2((float)ix / gridX, 1.0f - ((float)iy / gridY));
 				v.normal = glm::vec3(0.0f, 0.0f, 1.0f); /* +1 in z direction is perpendicular to plane */
 				
 				vertexData.push_back(v);

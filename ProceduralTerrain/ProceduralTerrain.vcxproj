@@ -120,6 +120,7 @@
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="LocalPlayer.cpp" />
+    <ClCompile Include="MeshModel.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Progam.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -127,7 +128,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Any.h" />
-    <ClInclude Include="Attribute.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CubeGeometry.h" />
@@ -138,8 +138,10 @@
     <ClInclude Include="InputReceiverInterface.h" />
     <ClInclude Include="LocalPlayer.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialBasicUploader.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="MeshBasicMaterial.h" />
+    <ClInclude Include="MaterialBasic.h" />
+    <ClInclude Include="MeshModel.h" />
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Object3D.h" />
     <ClInclude Include="PlaneGeometry.h" />
@@ -148,6 +150,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="BasicShaderData.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainGenerator.h" />
     <ClInclude Include="Texture.h" />

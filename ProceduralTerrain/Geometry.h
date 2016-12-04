@@ -15,8 +15,6 @@ public:
 	std::vector<GLuint> indices = std::vector<GLuint>();
 	GLuint VAO;
 
-	std::vector<Attribute> attributes = std::vector<Attribute>();
-
 	void applyMatrix(glm::mat4 matrix) {
 		for (int i = 0; i < vertexData.size(); i++) {
 			glm::vec3 vertex = vertexData.at(i).position;

@@ -1,19 +1,21 @@
 #pragma once
 
 #include <iostream>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "Camera.h"
 #include "Scene.h"
 #include "InputReceiverInterface.h"
+#include "MaterialBasicUploader.h"
+
 #include <glm/gtc/type_ptr.hpp>
 
 class Renderer
 {
 public:
 	Renderer();
-	~Renderer();
 	
 	int screenWidth, screenHeight;
 
@@ -23,8 +25,17 @@ public:
 	GLFWwindow* window;
 	bool shouldClose();
 private:
-	void uploadMesh(Mesh& mesh);
-	GLuint uploadShader(const char* code, unsigned int type);
-	GLuint createProgram(std::vector<GLuint> shaders);
+	void uploadGeometry(Geometry* geometry);
+	void uploadMaterial(Material* material);
+	void uploadTexture(Texture* texture);
 
+	GLuint createProgram(std::vector<GLuint> shaders);
+	void initializeUniformBuffer();
+
+	void updateProjectionMatrix(glm::mat4 projection);
+	void updateViewMatrix(glm::mat4 view);
+
+	GLuint uboMatrices;
+
+	MaterialBasicUploader materialBasicUploader;
 };

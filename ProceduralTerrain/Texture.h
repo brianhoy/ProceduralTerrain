@@ -8,14 +8,22 @@ public:
 	int edgeBehavior;
 	GLuint textureId;
 	unsigned char* image;
+	int width, height;
 
-	Texture(const char* path, int width, int height, int channels = 0, int type = SOIL_LOAD_RGB) {
+	const char * path;
+	int type;
+	int channels;
+
+
+	Texture(const char* path, int channels = 0, int type = SOIL_LOAD_RGB) :
+		width(width), height(height), channels(channels), type(type), path(path) {
+	}
+
+	void loadImageData() {
 		image = SOIL_load_image(path, &width, &height, &channels, type);
-		glGenTextures(1, &textureId);
-		glBindTexture(GL_TEXTURE_2D, textureId);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+
+	void freeImageData() {
 		SOIL_free_image_data(image);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 };
