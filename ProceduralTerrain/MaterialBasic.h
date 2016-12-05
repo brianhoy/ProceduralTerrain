@@ -19,10 +19,11 @@ public:
 	std::string fragmentCode;
 	std::string vertexCode;
 
-	Texture* texture;
+	std::vector<Texture*> textures = std::vector<Texture*>();
 
 	MaterialBasic(Texture * texture = NULL, std::string fragmentPath = "meshbasic.frag", std::string vertexPath = "meshbasic.vert") : 
-		texture(texture), fragmentShaderPath(fragmentPath), vertexShaderPath(vertexPath) {
+		fragmentShaderPath(fragmentPath), vertexShaderPath(vertexPath) {
+		textures.push_back(texture);
 		getFileData();
 	}
 

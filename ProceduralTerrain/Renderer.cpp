@@ -69,6 +69,15 @@ void Renderer::render(Camera* camera, Scene* scene)
 	for (int i = 0; i < scene->meshes.size(); i++) {
 		Mesh* mesh = scene->meshes.at(i);
 
+		renderMeshRecursive(camera, mesh);
+	}
+	// Swap the screen buffers
+	glfwSwapBuffers(window);
+}
+
+void Renderer::renderMeshRecursive(Camera* camera, Mesh* mesh) {
+	if (!mesh->noDraw) {
+
 		// If the geometry needs an update, upload it
 		if (mesh->geometry->needsUpdate) {
 			std::cout << "uploading geometry" << std::endl;
@@ -86,20 +95,27 @@ void Renderer::render(Camera* camera, Scene* scene)
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mesh->getModelMatrix()));
 
 		if (mesh->material->getType() == "MaterialBasic") {
-			materialBasicUploader.bindTexture(static_cast<MaterialBasic*>(mesh->material));
+			materialBasicUploader.bindTextures(static_cast<MaterialBasic*>(mesh->material));
 		}
 
 		glBindVertexArray(mesh->geometry->VAO); // Bind to VAO (stores attribute pointer data)
-			if (mesh->geometry->indices.size() == 0) { // If it's not indexed, use glDrawArrays
-				glDrawArrays(GL_TRIANGLES, 0, mesh->geometry->vertexData.size());
-			}
-			else { // If it is, use glDrawElements
-				glDrawElements(GL_TRIANGLES, mesh->geometry->indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
-			}
+		if (mesh->geometry->indices.size() == 0) { // If it's not indexed, use glDrawArrays
+			glDrawArrays(GL_TRIANGLES, 0, mesh->geometry->vertexData.size());
+		}
+		else { // If it is, use glDrawElements
+			glDrawElements(GL_TRIANGLES, mesh->geometry->indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
+		}
 		glBindVertexArray(0);
+
+		if (mesh->material->getType() == "MaterialBasic") {
+			materialBasicUploader.unbindTextures(static_cast<MaterialBasic*>(mesh->material));
+		}
 	}
-	// Swap the screen buffers
-	glfwSwapBuffers(window);
+
+	// Render each child
+	for (int i = 0; i < mesh->children.size(); i++) {
+		renderMeshRecursive(camera, &mesh->children.at(i));
+	}
 }
 
 void Renderer::terminate() {

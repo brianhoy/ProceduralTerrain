@@ -12,7 +12,7 @@
 #include "Mesh.h"
 #include "Texture.h"
 #include "MaterialBasic.h"
-
+#include "MeshModel.h"
 
 // Window dimensions
 

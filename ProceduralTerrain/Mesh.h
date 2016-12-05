@@ -9,7 +9,12 @@ public:
 	Geometry* geometry;
 	Material* material;
 
-	Mesh(Geometry* geometry, Material* material) : geometry(geometry), material(material) {
+	std::vector<Mesh> children;
+	bool noDraw = false;
+
+	Mesh(Geometry* geometry = nullptr, Material* material = nullptr, std::vector<Mesh> children = std::vector<Mesh>()) : 
+		geometry(geometry), material(material), children(children) {
+
 	}
 private:
 	int drawMode;

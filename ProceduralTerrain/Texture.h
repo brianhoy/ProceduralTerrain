@@ -10,17 +10,21 @@ public:
 	unsigned char* image;
 	int width, height;
 
-	const char * path;
-	int type;
+	std::string path;
+	std::string type;
+
+	int soilType;
 	int channels;
 
 
-	Texture(const char* path, int channels = 0, int type = SOIL_LOAD_RGB) :
-		width(width), height(height), channels(channels), type(type), path(path) {
+	Texture(std::string path = "", std::string type = "diffuse", int channels = 0, int soilType = SOIL_LOAD_RGB) :
+		width(width), height(height), channels(channels), type(type), soilType(soilType), path(path) 
+	{
 	}
 
 	void loadImageData() {
-		image = SOIL_load_image(path, &width, &height, &channels, type);
+		std::cout << "path: " << path << std::endl;
+		image = SOIL_load_image(path.c_str(), &width, &height, &channels, soilType);
 	}
 
 	void freeImageData() {

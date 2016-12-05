@@ -29,14 +29,20 @@ void Game::addTestMeshes() {
 	testmesh = new Mesh(planeGeometry, mat);
 	Mesh* testmesh2 = new Mesh(cubeGeometry, mat);
 
+	MeshModel* model = new MeshModel("../Content/sponza.obj", mat);
+
 	//std::cout << "mesh indices size" << testmesh->geometry->indices.size() << std::endl;
 
 	//testmesh->setScale(glm::vec3(1000.0f, 1000.0f, 1000.0f));
 
 	testmesh->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
+	testmesh2->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	model->setPosition(glm::vec3(-1.0f, 0.0f, 0.0f));
+	model->setScale(glm::vec3(0.03f, 0.03f, 0.03f));
 
 	scene.add(testmesh2);
 	scene.add(testmesh);
+	scene.add(model);
 
 }
 

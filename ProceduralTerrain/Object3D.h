@@ -58,6 +58,8 @@ public:
 		return glm::normalize(glm::vec3(modelMatrix[0].y, modelMatrix[1].y, modelMatrix[2].y));
 	}
 	glm::mat4 getModelMatrix() {
+		updateMatrix();
+
 		return modelMatrix;
 	}
 	glm::vec3 getPosition() {
@@ -124,5 +126,8 @@ public:
 		translationMatrix = glm::translate(glm::mat4(), position);
 
 		updateMatrix();
+	}
+	Object3D* getParent() {
+		return parent;
 	}
 };

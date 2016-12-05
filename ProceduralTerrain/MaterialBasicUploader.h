@@ -5,7 +5,7 @@ class MaterialBasicUploader {
 public:
 	void upload(MaterialBasic* material) {
 		uploadShader(material);
-		uploadTexture(material);
+		uploadTextures(material);
 		uploadUniforms(material);
 		material->needsUpdate = false;
 	}
@@ -68,20 +68,53 @@ public:
 		glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4)); // Bind it to point 0 */
 	}
 
-	void uploadTexture(MaterialBasic* material) {
-		material->texture->loadImageData();
-		glGenTextures(1, &material->texture->textureId);
-		glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, material->texture->width, material->texture->height, 0, 
-			GL_RGB, GL_UNSIGNED_BYTE, material->texture->image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		material->texture->freeImageData();
+	void uploadTextures(MaterialBasic* material) {
+		for (int i = 0; i < material->textures.size(); i++) {
+			Texture* texture = material->textures.at(i);
+			texture->loadImageData();
+			glGenTextures(1, &texture->textureId);
+			glBindTexture(GL_TEXTURE_2D, texture->textureId);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,texture->width, texture->height, 0,
+				GL_RGB, GL_UNSIGNED_BYTE, texture->image);
+			glGenerateMipmap(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			texture->freeImageData();
+		}
 	}
 
-	void bindTexture(MaterialBasic* material) {
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
-		glUniform1i(glGetUniformLocation(material->program, "texture1"), 0);
+	void bindTextures(MaterialBasic* material) {
+		GLuint diffuseNr = 1;
+		GLuint specularNr = 1;
+
+		for (int i = 0; i < material->textures.size(); i++) {
+			glActiveTexture(GL_TEXTURE0);
+			//glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
+			glUniform1i(glGetUniformLocation(material->program, "texture1"), 0);
+
+
+			glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
+											  // Retrieve texture number (the N in diffuse_textureN)
+			std::stringstream ss;
+			std::string number;
+			std::string name = material->textures.at(i)->type;
+			if (name == "texture_diffuse")
+				ss << diffuseNr++; // Transfer GLuint to stream
+			else if (name == "texture_specular")
+				ss << specularNr++; // Transfer GLuint to stream
+			number = ss.str();
+			// Now set the sampler to the correct texture unit
+			glUniform1i(glGetUniformLocation(material->program, (name + number).c_str()), i);
+			// And finally bind the texture
+			glBindTexture(GL_TEXTURE_2D, material->textures[i]->textureId);
+		}
+	}
+
+	void unbindTextures(MaterialBasic* material) 
+	{
+		for (GLuint i = 0; i < material->textures.size(); i++)
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
 	}
 };

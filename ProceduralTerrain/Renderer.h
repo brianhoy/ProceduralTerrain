@@ -21,6 +21,7 @@ public:
 
 	int createWindow(int width, int height);
 	void render(Camera* camera, Scene* scene);
+	void renderMeshRecursive(Camera * camera, Mesh * mesh);
 	void terminate();
 	GLFWwindow* window;
 	bool shouldClose();

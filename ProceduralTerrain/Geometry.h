@@ -10,7 +10,7 @@ class Renderer;
 class Geometry {
 	friend class Renderer;
 public:
-	bool needsUpdate;
+	bool needsUpdate = true;
 	std::vector<Vertex> vertexData = std::vector<Vertex>();
 	std::vector<GLuint> indices = std::vector<GLuint>();
 	GLuint VAO;

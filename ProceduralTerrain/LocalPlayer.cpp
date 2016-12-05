@@ -57,6 +57,8 @@ void LocalPlayer::processKeyboard(GLfloat deltaTime) {
 	if (keys[GLFW_KEY_S]) doMovement(BACKWARD, deltaTime);
 	if (keys[GLFW_KEY_A]) doMovement(LEFT, deltaTime);
 	if (keys[GLFW_KEY_D]) doMovement(RIGHT, deltaTime);
+	if (keys[GLFW_KEY_SPACE]) doMovement(UP, deltaTime);
+	if (keys[GLFW_KEY_LEFT_SHIFT]) doMovement(DOWN, deltaTime);
 }
 
 void LocalPlayer::doMovement(Direction direction, GLfloat deltaTime)
@@ -64,6 +66,7 @@ void LocalPlayer::doMovement(Direction direction, GLfloat deltaTime)
 
 	glm::vec3 right = getRight(); //glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 front = getFront(); //glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 up = getUp();
 
 	GLfloat velocity = deltaTime * movementSpeed;
 	if(direction == FORWARD)
@@ -74,13 +77,17 @@ void LocalPlayer::doMovement(Direction direction, GLfloat deltaTime)
 		translate(-1.0f * right * velocity);
 	if (direction == RIGHT)
 		translate(right * velocity);
+	if (direction == UP)
+		translate(up * velocity);
+	if (direction == DOWN)
+		translate(-1.0f * up * velocity);
 
 	std::cout << "doing movement, position: " << direction << ", cord: " << position.x << ", " << position.y << ", " << position.z << std::endl;
 }
 
 void LocalPlayer::doCameraRotation(double xdelta, double ydelta) {
 	if ((camera.getEulerAngles().x > 90.0f && ydelta > 0.0f) || (camera.getEulerAngles().x < -90.0f && ydelta < 0.0f)) {
-		//ydelta = 0;
+		//ydelta = 0.0f;
 	}
 
 	rotate(glm::vec3(0.0f, xdelta * mouseSensitivity, 0.0f));
