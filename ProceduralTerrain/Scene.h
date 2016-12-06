@@ -1,26 +1,48 @@
 #pragma once
+#include <vector>
 
 #include "Mesh.h"
 #include "Camera.h"
 #include "Object3D.h"
-#include <vector>
 
 class Scene
 {
 public:
 	Scene() {
-		meshes = std::vector<Mesh*>();
-		objects = std::vector<Object3D*>();
+		meshCollections.push_back(MeshCollection());
 	}
 
-	std::vector<Object3D*> objects;
-	std::vector<Mesh*> meshes;
+	std::vector<MeshCollection> meshCollections;
 
-	void add(Mesh* mesh) {
-		meshes.push_back(mesh);
+	void add(Mesh mesh) {
+		meshCollections.front().meshes.push_back(mesh);
 	}
 
-	void add(Object3D* obj) {
-		objects.push_back(obj);
+	void add(MeshCollection collection) {
+		meshCollections.push_back(collection);
+	}
+
+	bool remove(int uid) { // returns true if successful
+		for (int i = 0; i < meshCollections.size(); i++) {
+			if (recursiveRemove(&meshCollections.at(i), uid)) return true;
+		}
+		return false;
+	}
+
+	bool recursiveRemove(MeshCollection* collection, int uid) {
+		for (int i = 0; i < collection->meshes.size(); i++) {
+			if (collection->meshes.at(i).uid == uid) {
+				collection->meshes.erase(collection->meshes.begin() + i);
+				return true;
+			}
+		}
+		for (int i = 0; i < collection->meshCollections.size(); i++) {
+			if (collection->meshCollections.at(i).uid == uid) {
+				collection->meshCollections.erase(collection->meshCollections.begin() + i);
+				return true;
+			}
+			recursiveRemove(&collection->meshCollections.at(i), uid);
+		}
+		return false;
 	}
 };

@@ -138,6 +138,7 @@
     <ClInclude Include="LocalPlayer.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialBasicUploader.h" />
+    <ClInclude Include="Math.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MaterialBasic.h" />
     <ClInclude Include="MeshCollection.h" />

@@ -9,7 +9,7 @@
 #include "Scene.h"
 #include "InputReceiverInterface.h"
 #include "MaterialBasicUploader.h"
-
+#include "MeshCollection.h"
 #include <glm/gtc/type_ptr.hpp>
 
 class Renderer
