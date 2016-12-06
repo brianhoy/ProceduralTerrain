@@ -12,7 +12,8 @@
 #include "Mesh.h"
 #include "Texture.h"
 #include "MaterialBasic.h"
-#include "MeshModel.h"
+#include "MeshCollection.h"
+#include "OBJLoader.h"
 
 // Window dimensions
 

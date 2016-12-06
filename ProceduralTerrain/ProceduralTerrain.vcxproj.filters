@@ -143,9 +143,6 @@
     <ClInclude Include="MaterialBasic.h">
       <Filter>Header Files\Material</Filter>
     </ClInclude>
-    <ClInclude Include="MeshModel.h">
-      <Filter>Header Files\Mesh</Filter>
-    </ClInclude>
     <ClInclude Include="OBJLoader.h">
       <Filter>Header Files\Mesh</Filter>
     </ClInclude>

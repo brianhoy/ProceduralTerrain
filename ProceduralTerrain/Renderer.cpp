@@ -65,8 +65,9 @@ void Renderer::render(Camera* camera, Scene* scene)
 	projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
 	updateProjectionMatrix(projection);
 
-	// Render each mesh
-	for (int i = 0; i < scene->meshes.size(); i++) {
+	// Render each MeshCollection
+	for (int i = 0; i < scene->meshCollections.size(); i++) {
+		for()
 		Mesh* mesh = scene->meshes.at(i);
 
 		renderMeshRecursive(camera, mesh);

@@ -1,9 +1,12 @@
 #pragma once
 #include <string>
 #include <iostream>
+#include <memory>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
 #include "MaterialBasic.h"
 #include "MeshCollection.h"
 
@@ -13,7 +16,7 @@ private:
 	std::vector<Texture> loadedTextures;
 	std::string directory;
 public:
-	void loadModel(std::string path) {
+	MeshCollection loadModel(std::string path) {
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -26,13 +29,13 @@ public:
 		directory = path.substr(0, path.find_last_of('/'));
 		loadedTextures = std::vector<Texture>();
 
-		MaterialBasic* material = new MaterialBasic();
+		std::shared_ptr<MaterialBasic> material = std::shared_ptr<MaterialBasic>();
 
-		this->processNode(scene->mRootNode, scene, material);
+		return this->processNode(scene->mRootNode, scene, material);
 
 	}
 
-	MeshCollection processNode(aiNode* node, const aiScene* scene, Material* material)
+	MeshCollection processNode(aiNode* node, const aiScene* scene, std::shared_ptr<Material> material)
 	{
 		MeshCollection collection = MeshCollection();
 		// Process all the node's meshes (if any)
@@ -52,10 +55,10 @@ public:
 		}
 	}
 
-	Mesh processMesh(aiMesh* mesh, const aiScene* scene, Material* material)
+	Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::shared_ptr<Material> material)
 	{
 		// Data to fill
-		Geometry* geometry = new Geometry();
+		std::shared_ptr<Geometry> geometry = std::shared_ptr<Geometry>();
 		std::vector<Texture> textures;
 
 		// Walk through each of the mesh's vertices

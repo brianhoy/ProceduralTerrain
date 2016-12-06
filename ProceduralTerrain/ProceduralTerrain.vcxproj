@@ -142,7 +142,6 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MaterialBasic.h" />
     <ClInclude Include="MeshCollection.h" />
-    <ClInclude Include="MeshModel.h" />
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Object3D.h" />
     <ClInclude Include="OBJLoader.h" />

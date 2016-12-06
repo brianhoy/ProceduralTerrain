@@ -1,19 +1,18 @@
 ﻿#pragma once
 #include <vector>
 #include <algorithm>
+
 #include <GL/glew.h>
-#include "Vertex.h"
 #include <glm/gtc/matrix_inverse.hpp>
 
-class Renderer;
+#include "Vertex.h"
 
 class Geometry {
-	friend class Renderer;
 public:
 	bool needsUpdate = true;
 	std::vector<Vertex> vertexData = std::vector<Vertex>();
 	std::vector<GLuint> indices = std::vector<GLuint>();
-	GLuint VAO;
+	GLuint VAO, VBO, EBO;
 
 	void applyMatrix(glm::mat4 matrix) {
 		for (int i = 0; i < vertexData.size(); i++) {
@@ -70,7 +69,6 @@ public:
 	}
 
 private:
-	GLuint VBO, EBO; // only the VAO needs to be seen by the renderer
 	/* 
 		What is an adjacent vertex?
 			A vertex that is connected by an edge
