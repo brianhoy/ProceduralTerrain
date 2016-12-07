@@ -60,8 +60,8 @@ public:
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::shared_ptr<Material> material)
 	{
 		// Data to fill
-		std::shared_ptr<Geometry> geometry = std::shared_ptr<Geometry>();
-		std::vector<Texture> textures;
+		std::shared_ptr<Geometry> geometry = std::make_shared<Geometry>();
+		std::vector<Texture> textures = std::vector<Texture>();
 
 		// Walk through each of the mesh's vertices
 		for (GLuint i = 0; i < mesh->mNumVertices; i++)
@@ -95,7 +95,7 @@ public:
 			{
 				vertex.texCoords = glm::vec2(0.0f, 0.0f);
 			}
-			geometry->vertexData.push_back(vertex); // CRASHES HERE!!!! FDASFDSFD ACCess violation reading location 0x00...
+			geometry->vertexData.push_back(vertex); 
 		}
 
 		// Now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.

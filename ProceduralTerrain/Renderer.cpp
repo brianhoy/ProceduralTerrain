@@ -14,7 +14,7 @@ int Renderer::createWindow(int width, int height)
 	glfwInit();
 	// Set all the required options for GLFW
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
@@ -60,7 +60,7 @@ void Renderer::render(Camera* camera, Scene* scene)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Update view and projection matrices
-	updateViewMatrix(camera->GetViewMatrix());
+	updateViewMatrix(camera->GetViewMatrix()); // camera->GetViewMatrix == error
 	glm::mat4 projection;
 	projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
 	updateProjectionMatrix(projection);
@@ -239,6 +239,7 @@ GLuint Renderer::createProgram(std::vector<GLuint> shaders)
 
 void Renderer::initializeUniformBuffer()
 {
+	std::cout << "Uniform buffer initialized\n";
 	glGenBuffers(1, &uboMatrices);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
@@ -257,7 +258,9 @@ void Renderer::updateProjectionMatrix(glm::mat4 projection)
 
 void Renderer::updateViewMatrix(glm::mat4 view)
 {
-	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+	std::cout << "ln 260" << std::endl;
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices); // CRASH this causes access violation
+	std::cout << "ln 262" << std::endl;
 	glBufferSubData(
 		GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
