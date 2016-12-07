@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
 
+#include "MeshCollection.h"
 #include "Mesh.h"
 #include "Camera.h"
 #include "Object3D.h"
+#include "Texture.h"
 
 class Scene
 {
@@ -12,7 +14,8 @@ public:
 		meshCollections.push_back(MeshCollection());
 	}
 
-	std::vector<MeshCollection> meshCollections;
+	std::vector<MeshCollection> meshCollections = std::vector<MeshCollection>();
+
 
 	void add(Mesh mesh) {
 		meshCollections.front().meshes.push_back(mesh);

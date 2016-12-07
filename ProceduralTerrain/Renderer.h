@@ -21,7 +21,7 @@ public:
 
 	int createWindow(int width, int height);
 	void render(Camera* camera, Scene* scene);
-	void renderMeshRecursive(Camera * camera, Mesh * mesh);
+	void renderMeshCollectionRecursive(Camera * camera, MeshCollection * collection);
 	void terminate();
 	GLFWwindow* window;
 	bool shouldClose();
@@ -30,6 +30,9 @@ private:
 	void uploadMaterial(Material* material);
 	void uploadTexture(Texture* texture);
 
+	void bindTextures(std::vector<Texture> textures, GLuint program);
+	void unbindTextures(std::vector<Texture> textures);
+
 	GLuint createProgram(std::vector<GLuint> shaders);
 	void initializeUniformBuffer();
 
@@ -37,6 +40,9 @@ private:
 	void updateViewMatrix(glm::mat4 view);
 
 	GLuint uboMatrices;
+	// store the textures currently loaded in the GPU to know not to make duplicates
+	// the int keeps track of how many instance are kept. when it hits 0, the texture is unloaded
+	std::vector<std::pair<Texture, int>> loadedTextures = std::vector<std::pair<Texture, int>>(); 
 
 	MaterialBasicUploader materialBasicUploader;
 };

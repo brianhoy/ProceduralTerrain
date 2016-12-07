@@ -67,55 +67,54 @@ void Renderer::render(Camera* camera, Scene* scene)
 
 	// Render each MeshCollection
 	for (int i = 0; i < scene->meshCollections.size(); i++) {
-		for()
-		Mesh* mesh = scene->meshes.at(i);
-
-		renderMeshRecursive(camera, mesh);
+		for (MeshCollection c : scene->meshCollections) {
+			renderMeshCollectionRecursive(camera, &c);
+		}
 	}
 	// Swap the screen buffers
 	glfwSwapBuffers(window);
 }
 
-void Renderer::renderMeshRecursive(Camera* camera, Mesh* mesh) {
-	if (!mesh->noDraw) {
+void Renderer::renderMeshCollectionRecursive(Camera* camera, MeshCollection* collection) {
+	for (Mesh mesh : collection->meshes) {
+		if (!mesh.noDraw) {
+			// If the geometry needs an update, upload it
+			if (mesh.geometry->needsUpdate) {
+				std::cout << "uploading geometry" << std::endl;
+				uploadGeometry(mesh.geometry.get());
+			}
 
-		// If the geometry needs an update, upload it
-		if (mesh->geometry->needsUpdate) {
-			std::cout << "uploading geometry" << std::endl;
-			uploadGeometry(mesh->geometry);
-		}
+			// If the material needs an update, upload it
+			if (mesh.material->needsUpdate == true) {
+				std::cout << "uploading material" << std::endl;
+				uploadMaterial(mesh.material.get());
+			}
 
-		// If the material needs an update, call the upload function
-		if (mesh->material->needsUpdate == true) {
-			std::cout << "uploading material" << std::endl;
-			uploadMaterial(mesh->material);
-		}
-		glUseProgram(mesh->material->program);
+			// If any texture needs to be uploaded, upload it
+			for (int i = 0; i < mesh.textures.size(); i++) { 
+				if (mesh.textures.at(i).needsUpdate) {
+					uploadTexture(&mesh.textures.at(i));
+				}
+			}
 
-		GLint modelLoc = glGetUniformLocation(mesh->material->program, "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mesh->getModelMatrix()));
+			glUseProgram(mesh.material->program);
+				GLint modelLoc = glGetUniformLocation(mesh.material->program, "model");
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mesh.getModelMatrix()));
 
-		if (mesh->material->getType() == "MaterialBasic") {
-			materialBasicUploader.bindTextures(static_cast<MaterialBasic*>(mesh->material));
-		}
-
-		glBindVertexArray(mesh->geometry->VAO); // Bind to VAO (stores attribute pointer data)
-		if (mesh->geometry->indices.size() == 0) { // If it's not indexed, use glDrawArrays
-			glDrawArrays(GL_TRIANGLES, 0, mesh->geometry->vertexData.size());
-		}
-		else { // If it is, use glDrawElements
-			glDrawElements(GL_TRIANGLES, mesh->geometry->indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
-		}
-		glBindVertexArray(0);
-
-		if (mesh->material->getType() == "MaterialBasic") {
-			materialBasicUploader.unbindTextures(static_cast<MaterialBasic*>(mesh->material));
+				bindTextures(mesh.textures, mesh.material->program);
+					glBindVertexArray(mesh.geometry->VAO); // Bind to VAO (stores attribute pointer data)
+						if (mesh.geometry->indices.size() == 0) { // If it's not indexed, use glDrawArrays
+							glDrawArrays(GL_TRIANGLES, 0, mesh.geometry->vertexData.size());
+						}
+						else { // If it is, use glDrawElements
+							glDrawElements(GL_TRIANGLES, mesh.geometry->indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
+						}
+					glBindVertexArray(0);
+				unbindTextures(mesh.textures);
 		}
 	}
-
-	// Render each child
-	for (int i = 0; i < mesh->children.size(); i++) {
-		renderMeshRecursive(camera, &mesh->children.at(i));
+	for (MeshCollection collection : collection->meshCollections) {
+		renderMeshCollectionRecursive(camera, &collection);
 	}
 }
 
@@ -172,8 +171,65 @@ void Renderer::uploadMaterial(Material * material)
 	}
 }
 
-void Renderer::uploadTexture(Texture * texture)
+void Renderer::uploadTexture(Texture* texture)
 {
+	// first check if the texture already exists in GPU memory
+	bool found = false;
+	for (int i = 0; i < loadedTextures.size(); i++) {
+		if (texture->path == loadedTextures.at(i).first.path) {
+			loadedTextures.at(i).second++; // increment count
+			*texture = loadedTextures.at(i).first;
+			return;
+		}
+	}
+	if (!found) { // new texture? upload it!
+		texture->loadImageData();
+		glGenTextures(1, &texture->textureId);
+		glBindTexture(GL_TEXTURE_2D, texture->textureId);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture->width, texture->height, 0,
+			GL_RGB, GL_UNSIGNED_BYTE, texture->image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		texture->freeImageData();
+
+		loadedTextures.push_back(std::pair<Texture, int>(*texture, 1));
+	}
+}
+
+void Renderer::bindTextures(std::vector<Texture> textures, GLuint program)
+{
+	GLuint diffuseNr = 1;
+	GLuint specularNr = 1;
+
+	for (int i = 0; i < textures.size(); i++) {
+		glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
+		glUniform1i(glGetUniformLocation(program, "texture1"), 0);
+
+
+		glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
+										  // Retrieve texture number (the N in diffuse_textureN)
+		std::stringstream ss;
+		std::string number;
+		std::string name = textures.at(i).type;
+		if (name == "texture_diffuse")
+			ss << diffuseNr++; // Transfer GLuint to stream
+		else if (name == "texture_specular")
+			ss << specularNr++; // Transfer GLuint to stream
+		number = ss.str();
+		// Now set the sampler to the correct texture unit
+		glUniform1i(glGetUniformLocation(program, (name + number).c_str()), i);
+		// And finally bind the texture
+		glBindTexture(GL_TEXTURE_2D, textures[i].textureId);
+	}
+}
+
+void Renderer::unbindTextures(std::vector<Texture> textures) {
+	for (GLuint i = 0; i < textures.size(); i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 }
 
 GLuint Renderer::createProgram(std::vector<GLuint> shaders)

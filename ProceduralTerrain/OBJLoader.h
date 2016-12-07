@@ -15,6 +15,7 @@ class OBJLoader
 private:
 	std::vector<Texture> loadedTextures;
 	std::string directory;
+
 public:
 	MeshCollection loadModel(std::string path) {
 		Assimp::Importer importer;
@@ -23,13 +24,13 @@ public:
 		if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 		{
 			std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
-			return;
+			return MeshCollection();
 		}
 
 		directory = path.substr(0, path.find_last_of('/'));
 		loadedTextures = std::vector<Texture>();
 
-		std::shared_ptr<MaterialBasic> material = std::shared_ptr<MaterialBasic>();
+		std::shared_ptr<MaterialBasic> material = std::make_shared<MaterialBasic>();//std::shared_ptr<MaterialBasic>();
 
 		return this->processNode(scene->mRootNode, scene, material);
 
@@ -53,6 +54,7 @@ public:
 		{
 			collection.meshCollections.push_back(this->processNode(node->mChildren[i], scene, material));
 		}
+		return collection;
 	}
 
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::shared_ptr<Material> material)
@@ -93,7 +95,7 @@ public:
 			{
 				vertex.texCoords = glm::vec2(0.0f, 0.0f);
 			}
-			geometry->vertexData.push_back(vertex);
+			geometry->vertexData.push_back(vertex); // CRASHES HERE!!!! FDASFDSFD ACCess violation reading location 0x00...
 		}
 
 		// Now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.

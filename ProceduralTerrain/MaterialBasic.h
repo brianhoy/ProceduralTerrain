@@ -1,6 +1,5 @@
 #pragma once
 #include "Material.h"
-#include "Texture.h"
 #include <sstream>
 
 #include <fstream>
@@ -19,11 +18,8 @@ public:
 	std::string fragmentCode;
 	std::string vertexCode;
 
-	std::vector<Texture*> textures = std::vector<Texture*>();
-
-	MaterialBasic(Texture * texture = NULL, std::string fragmentPath = "meshbasic.frag", std::string vertexPath = "meshbasic.vert") : 
+	MaterialBasic(std::string fragmentPath = "meshbasic.frag", std::string vertexPath = "meshbasic.vert") : 
 		fragmentShaderPath(fragmentPath), vertexShaderPath(vertexPath) {
-		textures.push_back(texture);
 		getFileData();
 	}
 
