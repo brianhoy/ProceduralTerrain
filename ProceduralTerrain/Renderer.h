@@ -1,6 +1,9 @@
 #pragma once
 
 #include <iostream>
+#include <ctime>
+#include <chrono>
+#include <sstream>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -18,8 +21,10 @@ public:
 	Renderer();
 	
 	int screenWidth, screenHeight;
+	long lastVersion = -1;
 
 	int createWindow(int width, int height);
+	void updateScene(Scene* scene);
 	void render(Camera* camera, Scene* scene);
 	void renderMeshCollectionRecursive(Camera * camera, MeshCollection * collection);
 	void terminate();
@@ -30,7 +35,7 @@ private:
 	void uploadMaterial(Material* material);
 	void uploadTexture(Texture* texture);
 
-	void bindTextures(std::vector<Texture> textures, GLuint program);
+	void bindTextures(std::vector<Texture>* textures, GLuint program);
 	void unbindTextures(std::vector<Texture> textures);
 
 	GLuint createProgram(std::vector<GLuint> shaders);

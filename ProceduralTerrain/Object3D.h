@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -12,7 +13,6 @@ protected:
 	glm::quat quaternion;
 	glm::vec3 scale;
 
-	Object3D* parent = nullptr;
 	glm::mat4 translationMatrix;
 	glm::mat4 rotationMatrix;
 	glm::mat4 scaleMatrix;
@@ -35,6 +35,8 @@ protected:
 	}
 
 public:
+	Object3D* parent = nullptr;
+
 	Object3D() {
 		quaternion = glm::quat();
 		position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -76,9 +78,9 @@ public:
 		return glm::vec3(glm::degrees(euler.x), glm::degrees(euler.y), glm::degrees(euler.z));
 	}
 
-	void add(Object3D& obj) {
-		if (&obj == this) return;
-		obj.parent = this;
+	void add(Object3D* obj) {
+		if (obj == this) return;
+		obj->parent = this;
 	}
 	void rotate(float angle, glm::vec3& axis) {
 		quaternion *= glm::angleAxis(angle, axis);

@@ -16,10 +16,12 @@ public:
 	int soilType;
 	int channels;
 
-	bool needsUpdate = true;
+	bool needsUpdate;
 
 	Texture(std::string path = "", std::string type = "diffuse", int channels = 0, int soilType = SOIL_LOAD_RGB) :
-		width(width), height(height), channels(channels), type(type), soilType(soilType), path(path) {}
+		width(width), height(height), channels(channels), type(type), soilType(soilType), path(path) {
+		needsUpdate = true;
+	}
 
 	void loadImageData() {
 		std::cout << "path: " << path << std::endl;

@@ -51,8 +51,42 @@ int Renderer::createWindow(int width, int height)
 	return 0;
 }
 
+void Renderer::updateScene(Scene* scene) {
+	for (int i = 0; i < scene->renderedMeshes.size(); i++) {
+		auto mesh = scene->renderedMeshes.at(i);
+		if (!mesh->noDraw) {
+			// If the geometry needs an update, upload it
+			if (mesh->geometry->needsUpdate == true) {
+				std::cout << "uploading geometry" << std::endl;
+				uploadGeometry(mesh->geometry.get());
+			}
+
+			// If the material needs an update, upload it
+			if (mesh->material->needsUpdate == true) {
+				std::cout << "uploading material" << std::endl;
+				uploadMaterial(mesh->material.get());
+			}
+
+			// If any texture needs to be uploaded, upload it
+			for (int i = 0; i < mesh->textures.size(); i++) {
+				if (mesh->textures.at(i).needsUpdate == true) {
+					std::cout << "uploading textures" << std::endl;
+					uploadTexture(&mesh->textures.at(i));
+				}
+			}
+		}
+	}
+	lastVersion = scene->version;
+}
+
 void Renderer::render(Camera* camera, Scene* scene)
 {
+	if (scene->version != lastVersion) {
+		updateScene(scene);
+	}
+
+	auto t_start = std::chrono::high_resolution_clock::now();
+
 	// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 	glfwPollEvents();
 
@@ -65,18 +99,51 @@ void Renderer::render(Camera* camera, Scene* scene)
 	projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
 	updateProjectionMatrix(projection);
 
-	// Render each MeshCollection
-	for (int i = 0; i < scene->meshCollections.size(); i++) {
-		for (MeshCollection c : scene->meshCollections) {
-			renderMeshCollectionRecursive(camera, &c);
+	// Render each mesh //MeshCollection
+	/*for (int i = 0; i < scene->meshCollections.size(); i++) {
+		for (auto c : scene->meshCollections) {
+			renderMeshCollectionRecursive(camera, c.get());
+		}
+	}*/
+
+	for (int i = 0; i < scene->renderedMeshes.size(); i++) {
+		auto mesh = scene->renderedMeshes.at(i);
+		if (!mesh->noDraw) {
+			// If the geometry needs an update, upload it
+			glUseProgram(mesh->material->program);
+			GLint modelLoc = glGetUniformLocation(mesh->material->program, "model");
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mesh->getModelMatrix()));
+
+			bindTextures(&mesh->textures, mesh->material->program);
+			glBindVertexArray(mesh->geometry->VAO); // Bind to VAO (stores attribute pointer data)
+			if (mesh->geometry->indices.size() == 0) { // If it's not indexed, use glDrawArrays
+				glDrawArrays(GL_TRIANGLES, 0, mesh->geometry->vertexData.size());
+			}
+			else { // If it is, use glDrawElements
+				glDrawElements(GL_TRIANGLES, mesh->geometry->indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
+			}
+			glBindVertexArray(0);
+			//unbindTextures(mesh->textures);
 		}
 	}
+
 	// Swap the screen buffers
 	glfwSwapBuffers(window);
+
+	auto t_end = std::chrono::high_resolution_clock::now();
+	auto fps = 1000.0f / std::chrono::duration<double, std::milli>(t_end - t_start).count();
+
+	std::ostringstream strs;
+	strs << fps;
+	std::string str = strs.str();
+
+
+	std::string title = "Procedural Terrain" + str + "FPS";
+	glfwSetWindowTitle(window, title.c_str()); 
 }
 
 void Renderer::renderMeshCollectionRecursive(Camera* camera, MeshCollection* collection) {
-	for (Mesh mesh : collection->meshes) {
+	/*for (auto mesh : collection->meshes) {
 		if (!mesh.noDraw) {
 			// If the geometry needs an update, upload it
 			if (mesh.geometry->needsUpdate) {
@@ -113,9 +180,9 @@ void Renderer::renderMeshCollectionRecursive(Camera* camera, MeshCollection* col
 				unbindTextures(mesh.textures);
 		}
 	}
-	for (MeshCollection collection : collection->meshCollections) {
-		renderMeshCollectionRecursive(camera, &collection);
-	}
+	for (auto collection : collection->meshCollections) {
+		renderMeshCollectionRecursive(camera, collection.get());
+	} */
 }
 
 void Renderer::terminate() {
@@ -179,6 +246,8 @@ void Renderer::uploadTexture(Texture* texture)
 		if (texture->path == loadedTextures.at(i).first.path) {
 			loadedTextures.at(i).second++; // increment count
 			*texture = loadedTextures.at(i).first;
+			texture->needsUpdate = false;
+
 			return;
 		}
 	}
@@ -191,27 +260,28 @@ void Renderer::uploadTexture(Texture* texture)
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		texture->freeImageData();
+		texture->needsUpdate = false;
 
 		loadedTextures.push_back(std::pair<Texture, int>(*texture, 1));
 	}
 }
 
-void Renderer::bindTextures(std::vector<Texture> textures, GLuint program)
+void Renderer::bindTextures(std::vector<Texture>* textures, GLuint program)
 {
 	GLuint diffuseNr = 1;
 	GLuint specularNr = 1;
 
-	for (int i = 0; i < textures.size(); i++) {
-		glActiveTexture(GL_TEXTURE0);
+	for (int i = 0; i < textures->size(); i++) {
+		//glActiveTexture(GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
-		glUniform1i(glGetUniformLocation(program, "texture1"), 0);
+		//glUniform1i(glGetUniformLocation(program, "texture1"), 0);
 
 
 		glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
 										  // Retrieve texture number (the N in diffuse_textureN)
 		std::stringstream ss;
 		std::string number;
-		std::string name = textures.at(i).type;
+		std::string name = textures->at(i).type;
 		if (name == "texture_diffuse")
 			ss << diffuseNr++; // Transfer GLuint to stream
 		else if (name == "texture_specular")
@@ -220,7 +290,7 @@ void Renderer::bindTextures(std::vector<Texture> textures, GLuint program)
 		// Now set the sampler to the correct texture unit
 		glUniform1i(glGetUniformLocation(program, (name + number).c_str()), i);
 		// And finally bind the texture
-		glBindTexture(GL_TEXTURE_2D, textures[i].textureId);
+		glBindTexture(GL_TEXTURE_2D, textures->at(i).textureId);
 	}
 }
 
@@ -239,7 +309,6 @@ GLuint Renderer::createProgram(std::vector<GLuint> shaders)
 
 void Renderer::initializeUniformBuffer()
 {
-	std::cout << "Uniform buffer initialized\n";
 	glGenBuffers(1, &uboMatrices);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
@@ -258,9 +327,7 @@ void Renderer::updateProjectionMatrix(glm::mat4 projection)
 
 void Renderer::updateViewMatrix(glm::mat4 view)
 {
-	std::cout << "ln 260" << std::endl;
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices); // CRASH this causes access violation
-	std::cout << "ln 262" << std::endl;
 	glBufferSubData(
 		GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);

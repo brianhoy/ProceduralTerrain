@@ -5,7 +5,7 @@
 LocalPlayer::LocalPlayer(glm::vec3 position, GLfloat movementSpeed, GLfloat mouseSensitivity) :
 	Player(position), camera(Camera(glm::vec3(0.0f, 0.0f, 0.0f))), movementSpeed(movementSpeed), mouseSensitivity(mouseSensitivity)
 {
-	add(camera);
+	add(&camera);
 }
 
 

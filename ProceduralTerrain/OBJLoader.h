@@ -17,14 +17,14 @@ private:
 	std::string directory;
 
 public:
-	MeshCollection loadModel(std::string path) {
+	std::shared_ptr<MeshCollection> loadModel(std::string path) {
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 		if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 		{
 			std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
-			return MeshCollection();
+			return nullptr;
 		}
 
 		directory = path.substr(0, path.find_last_of('/'));
@@ -36,28 +36,30 @@ public:
 
 	}
 
-	MeshCollection processNode(aiNode* node, const aiScene* scene, std::shared_ptr<Material> material)
+	std::shared_ptr<MeshCollection> processNode(aiNode* node, const aiScene* scene, std::shared_ptr<Material> material)
 	{
-		MeshCollection collection = MeshCollection();
+		std::shared_ptr<MeshCollection> collection = std::make_shared<MeshCollection>();
 		// Process all the node's meshes (if any)
 		for (GLuint i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* aiMesh = scene->mMeshes[node->mMeshes[i]];
 
-			Mesh mesh = processMesh(aiMesh, scene, material);
-			collection.add(mesh);
-			collection.meshes.push_back(mesh);
+			auto mesh = processMesh(aiMesh, scene, material);
+			collection->add(mesh.get());
+			collection->meshes.push_back(mesh);
 		}
 
 		// Then do the same for each of its children
 		for (GLuint i = 0; i < node->mNumChildren; i++)
 		{
-			collection.meshCollections.push_back(this->processNode(node->mChildren[i], scene, material));
+			auto child = this->processNode(node->mChildren[i], scene, material);
+			collection->add(child.get());
+			collection->meshCollections.push_back(child);
 		}
 		return collection;
 	}
 
-	Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::shared_ptr<Material> material)
+	std::shared_ptr<Mesh> processMesh(aiMesh* mesh, const aiScene* scene, std::shared_ptr<Material> material)
 	{
 		// Data to fill
 		std::shared_ptr<Geometry> geometry = std::make_shared<Geometry>();
@@ -126,8 +128,8 @@ public:
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 		}
 
-		Mesh finalMesh = Mesh(geometry, material);
-		finalMesh.textures = textures;
+		auto finalMesh = std::make_shared<Mesh>(geometry, material);
+		finalMesh->textures = textures;
 
 		return finalMesh;
 	}
