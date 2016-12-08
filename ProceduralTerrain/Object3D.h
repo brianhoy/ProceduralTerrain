@@ -36,6 +36,9 @@ protected:
 
 public:
 	Object3D* parent = nullptr;
+	long version = 0;
+	long lastParentVersion = -1;
+	long lastVersion;
 
 	Object3D() {
 		quaternion = glm::quat();
@@ -60,7 +63,13 @@ public:
 		return glm::normalize(glm::vec3(modelMatrix[0].y, modelMatrix[1].y, modelMatrix[2].y));
 	}
 	glm::mat4 getModelMatrix() {
-		updateMatrix();
+		if (version != lastVersion || (parent != nullptr && lastParentVersion != parent->version)) {
+			if (parent != nullptr) {
+				lastParentVersion = parent->version;
+			}
+			updateMatrix();
+		}
+		
 
 		return modelMatrix;
 	}
@@ -83,11 +92,13 @@ public:
 		obj->parent = this;
 	}
 	void rotate(float angle, glm::vec3& axis) {
+		version++;
 		quaternion *= glm::angleAxis(angle, axis);
 		updateRotationMatrix();
 		updateMatrix();
 	}
 	void rotate(glm::vec3& eulerAngles) {
+		version++;
 		quaternion = glm::angleAxis(glm::radians(eulerAngles.x), glm::vec3(1.0f, 0.0f, 0.0f)) * quaternion;
 		quaternion = glm::angleAxis(glm::radians(eulerAngles.y), glm::vec3(0.0f, 1.0f, 0.0f)) * quaternion;
 		quaternion = glm::angleAxis(glm::radians(eulerAngles.z), glm::vec3(0.0f, 0.0f, 1.0f)) * quaternion;
@@ -96,6 +107,7 @@ public:
 		updateMatrix();
 	}
 	void setAngles(glm::vec3& eulerAngles) {
+		version++;
 		quaternion = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 		rotate(eulerAngles);
 
@@ -103,18 +115,21 @@ public:
 		updateMatrix();
 	}
 	void setAngles(glm::quat quaternion_) {
+		version++;
 		quaternion = quaternion_;
 
 		updateRotationMatrix();
 		updateMatrix();
 	}
 	void setScale(glm::vec3 scale_) {
+		version++;
 		scale = scale_;
 		scaleMatrix = glm::scale(glm::mat4(), scale);
 
 		updateMatrix();
 	}
 	void translate(glm::vec3& translation) {
+		version++;
 		std::cout << "translation: (" << translation.x << ", " << translation.y << ", " << translation.z << ")" << std::endl;
 
 		position += translation;
@@ -124,6 +139,7 @@ public:
 		updateMatrix();
 	}
 	void setPosition(glm::vec3 position_) {
+		version++;
 		position = position_;
 		translationMatrix = glm::translate(glm::mat4(), position);
 

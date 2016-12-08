@@ -5,7 +5,7 @@ class MaterialBasicUploader {
 public:
 	void upload(MaterialBasic* material) {
 		uploadShader(material);
-		uploadUniforms(material);
+		setUniformBlockIndices(material);
 		material->needsUpdate = false;
 	}
 
@@ -57,7 +57,10 @@ public:
 		std::cout << "program " << material->program << std::endl;
 	}
 
-	void uploadUniforms(MaterialBasic* material) {
+	void setUniformBlockIndices(MaterialBasic* material) {
+		GLuint matrices_index = glGetUniformBlockIndex(material->program, "Matrices");
+		glUniformBlockBinding(material->program, matrices_index, 0);
+
 		/*glGenBuffers(1, &uboMatrices);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
