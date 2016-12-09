@@ -7,13 +7,13 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Camera.h"
 #include "Scene.h"
 #include "InputReceiverInterface.h"
 #include "MaterialBasicUploader.h"
 #include "MeshCollection.h"
-#include <glm/gtc/type_ptr.hpp>
 
 class Renderer
 {
@@ -21,6 +21,10 @@ public:
 	Renderer();
 	
 	int screenWidth, screenHeight;
+
+	int frameNumber;
+	GLuint lastBoundMeshId;
+
 	long lastVersion = -1;
 
 	int createWindow(int width, int height);
@@ -48,6 +52,7 @@ private:
 	// store the textures currently loaded in the GPU to know not to make duplicates
 	// the int keeps track of how many instance are kept. when it hits 0, the texture is unloaded
 	std::vector<std::pair<Texture, int>> loadedTextures = std::vector<std::pair<Texture, int>>(); 
+	std::vector<GLuint> boundTextures = std::vector<GLuint>(32);
 
 	MaterialBasicUploader materialBasicUploader;
 };

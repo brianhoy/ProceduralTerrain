@@ -47,11 +47,14 @@ int Renderer::createWindow(int width, int height)
 
 	initializeUniformBuffer();
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 
 	return 0;
 }
 
 void Renderer::updateScene(Scene* scene) {
+	auto t_start = std::chrono::high_resolution_clock::now();
+
 	for (int i = 0; i < scene->renderedMeshes.size(); i++) {
 		auto mesh = scene->renderedMeshes.at(i);
 		if (!mesh->noDraw) {
@@ -65,6 +68,7 @@ void Renderer::updateScene(Scene* scene) {
 			if (mesh->material->needsUpdate == true) {
 				std::cout << "uploading material" << std::endl;
 				uploadMaterial(mesh->material.get());
+				mesh->modelLocation = glGetUniformLocation(mesh->material->program, "model");
 			}
 
 			// If any texture needs to be uploaded, upload it
@@ -77,10 +81,20 @@ void Renderer::updateScene(Scene* scene) {
 		}
 	}
 	lastVersion = scene->version;
+
+	auto t_end = std::chrono::high_resolution_clock::now();
+	auto loadTime = std::chrono::duration<double, std::milli>(t_end - t_start).count() / 1000.0f;
+
+	std::ostringstream strs;
+	strs << loadTime;
+	std::string str = strs.str();
+
+	std::cout << "Total Scene Load Time: " << str;
 }
 
 void Renderer::render(Camera* camera, Scene* scene)
 {
+	frameNumber++;
 	if (scene->version != lastVersion) {
 		updateScene(scene);
 	}
@@ -99,22 +113,39 @@ void Renderer::render(Camera* camera, Scene* scene)
 	projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
 	updateProjectionMatrix(projection);
 
-	// Render each mesh //MeshCollection
-	/*for (int i = 0; i < scene->meshCollections.size(); i++) {
-		for (auto c : scene->meshCollections) {
-			renderMeshCollectionRecursive(camera, c.get());
-		}
-	}*/
+	auto viewmat_upd = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - t_start).count();
+
+	double texBindTime = 0.0f;
+	double usePrgAndUniformTime = 0.0f;
+	double vrtxBindTime = 0.0f;
 
 	for (int i = 0; i < scene->renderedMeshes.size(); i++) {
+
 		auto mesh = scene->renderedMeshes.at(i);
 		if (!mesh->noDraw) {
-			// If the geometry needs an update, upload it
-			glUseProgram(mesh->material->program);
-			GLint modelLoc = glGetUniformLocation(mesh->material->program, "model");
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mesh->getModelMatrix()));
+			auto msh_start = std::chrono::high_resolution_clock::now(); // BENCHMARK
+
+			if (mesh->material->program != lastBoundMeshId) { // check if new shader needs to be bound
+				glUseProgram(mesh->material->program);
+				lastBoundMeshId = mesh->material->program;
+			}
+
+			if (mesh->version != mesh->lastVersionUploaded) { // check if object's model matrix needs to be updated/uploaded
+				glUniformMatrix4fv(mesh->modelLocation, 1, GL_FALSE, glm::value_ptr(mesh->getModelMatrix()));
+				mesh->lastVersionUploaded = mesh->version;
+			}
+
+			// BENCHMARK 16ms -> 0.4fps
+			usePrgAndUniformTime += std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - msh_start).count();
+			msh_start = std::chrono::high_resolution_clock::now();
 
 			bindTextures(&mesh->textures, mesh->material->program);
+
+			// BENCHMARK 7ms
+			texBindTime += std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - msh_start).count();
+			msh_start = std::chrono::high_resolution_clock::now();
+
+
 			glBindVertexArray(mesh->geometry->VAO); // Bind to VAO (stores attribute pointer data)
 			if (mesh->geometry->indices.size() == 0) { // If it's not indexed, use glDrawArrays
 				glDrawArrays(GL_TRIANGLES, 0, mesh->geometry->vertexData.size());
@@ -124,14 +155,23 @@ void Renderer::render(Camera* camera, Scene* scene)
 			}
 			glBindVertexArray(0);
 			//unbindTextures(mesh->textures);
+
+			// BENCHMARK 0.04ms
+			vrtxBindTime += std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - msh_start).count();
 		}
 	}
+
+	auto meshdraw_upd = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - t_start).count();
 
 	// Swap the screen buffers
 	glfwSwapBuffers(window);
 
-	auto t_end = std::chrono::high_resolution_clock::now();
-	auto fps = 1000.0f / std::chrono::duration<double, std::milli>(t_end - t_start).count();
+	auto fps = 1000.0f / std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - t_start).count();
+
+
+	if (frameNumber % 300 == 0) {
+		std::cout << "viewmat_upd: " << viewmat_upd << ", meshdraw_upd: " << meshdraw_upd << ", vrtxBindTime: " << vrtxBindTime << ", texBindTime: " << texBindTime << ", usePrgAndUniformTime: " << usePrgAndUniformTime << std::endl;
+	}
 
 	std::ostringstream strs;
 	strs << fps;
@@ -275,7 +315,11 @@ void Renderer::bindTextures(std::vector<Texture>* textures, GLuint program)
 		//glActiveTexture(GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
 		//glUniform1i(glGetUniformLocation(program, "texture1"), 0);
+		if (boundTextures.at(i) == textures->at(i).textureId) {
+			continue;
+		}
 
+		boundTextures.at(i) = textures->at(i).textureId;
 
 		glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
 										  // Retrieve texture number (the N in diffuse_textureN)

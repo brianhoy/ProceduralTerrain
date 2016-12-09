@@ -36,9 +36,13 @@ protected:
 
 public:
 	Object3D* parent = nullptr;
-	long version = 0;
-	long lastParentVersion = -1;
-	long lastVersion;
+	int version = 0;
+
+	int lastVersion = -1;
+	int lastParentVersion = -1;
+	int lastVersionUploaded = -1;
+
+	int modelLocation;
 
 	Object3D() {
 		quaternion = glm::quat();

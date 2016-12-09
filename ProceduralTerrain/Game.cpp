@@ -20,7 +20,6 @@ Game::~Game()
 }
 
 void Game::addTestMeshes() {
-	auto t_start = std::chrono::high_resolution_clock::now();
 
 	std::shared_ptr<PlaneGeometry> planeGeometry = std::make_shared<PlaneGeometry>(1, 1, 10, 10);
 	std::shared_ptr<CubeGeometry> cubeGeometry = std::make_shared<CubeGeometry>();
@@ -48,15 +47,8 @@ void Game::addTestMeshes() {
 	//scene.add(testmesh);
 	scene.add(model);
 
-	auto t_end = std::chrono::high_resolution_clock::now();
-	auto loadTime = 1000.0f * std::chrono::duration<double, std::milli>(t_end - t_start).count();
-
-	std::ostringstream strs;
-	strs << loadTime;
-	std::string str = strs.str();
 
 
-	std::cout << "Total Load Time: " << str;
 
 }
 
