@@ -45,12 +45,16 @@ int Renderer::createWindow(int width, int height)
 	glfwGetFramebufferSize(window, &vwidth, &vheight);
 	glViewport(0, 0, vwidth, vheight);
 
+	void APIENTRY glErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
+
+	glDebugMessageCallback(glErrorCallback, nullptr);
+
 	initializeUniformBuffer();
 	initializeTextureArray();
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-
+	glEnable(GL_DEBUG_OUTPUT);
 	return 0;
 }
 
@@ -88,7 +92,7 @@ void Renderer::updateScene(Scene* scene) {
 	lastVersion = scene->version;
 
 	if (textures_uploaded) {
-		generateTextureArrayMips();
+		//generateTextureArrayMips();
 	}
 
 	auto t_end = std::chrono::high_resolution_clock::now();
@@ -98,7 +102,7 @@ void Renderer::updateScene(Scene* scene) {
 	strs << loadTime;
 	std::string str = strs.str();
 
-	std::cout << "Total Scene Load Time: " << str;
+	std::cout << "Total Scene Load Time: " << str << std::endl;
 }
 
 void Renderer::render(Camera* camera, Scene* scene)
@@ -346,9 +350,7 @@ void Renderer::bindTextures(std::vector<Texture>* textures, GLuint program)
 		if (textures->at(i).textureArrayLocation != -1) {
 			if (name == "texture_diffuse" && diffuseNr == 1)
 			{
-				glActiveTexture(GL_TEXTURE0);
 				glUniform1i(1, textures->at(i).textureArrayLocation);
-				glBindTexture(GL_TEXTURE_2D_ARRAY, arrayTexture);
 			}
 		}
 		else {
@@ -377,26 +379,60 @@ void Renderer::unbindTextures(std::vector<Texture> textures) {
 }
 
 void Renderer::initializeTextureArray() {
-	glGenTextures(1, &arrayTexture);
+	std::cout << "initializing texture array" << std::endl;
+
+	glGenTextures( 1, &arrayTexture );
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, arrayTexture);
+ 
+	//Create storage for the texture. (100 layers of 1x1 texels)
+	glTexStorage3D( GL_TEXTURE_2D_ARRAY,
+				1,                    //No mipmaps as textures are 1x1
+				GL_RGB8,              //Internal format
+				1024, 1024,                 //width,height
+				100                   //Number of layers
+			);
 
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY,
-		1,                    //5 mipmaps
-		GL_RGB,               //Internal format
-		1024, 1024,           //width,height
-		256                   //Number of layers
-	);
+	/*GLubyte red[] = { 255, 0, 0 };
+	GLubyte green[] = { 0, 255, 0 };
+	GLubyte blue[] = { 0, 0, 255 };
+
+	glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+	0,                      //Mipmap number
+	0, 0, 0, //xoffset, yoffset, zoffset
+	1, 1, 1,          //width, height, depth
+	GL_RGB,                 //format
+	GL_UNSIGNED_BYTE,       //type
+	red); //pointer to data
+
+	glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+	0,                      //Mipmap number
+	0, 0, 1, //xoffset, yoffset, zoffset
+	1, 1, 1,          //width, height, depth
+	GL_RGB,                 //format
+	GL_UNSIGNED_BYTE,       //type
+	green); //pointer to data
+
+	glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+	0,                      //Mipmap number
+	0, 0, 2, //xoffset, yoffset, zoffset
+	1, 1, 1,          //width, height, depth
+	GL_RGB,                 //format
+	GL_UNSIGNED_BYTE,       //type
+	blue); //pointer to data */
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+	std::cout << "done initializing texture array" << std::endl;
 }
 
 void Renderer::addTextureToTextureArray(Texture* texture)
 {
+	//if (true) return;
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, arrayTexture);
 
@@ -449,7 +485,7 @@ void Renderer::updateProjectionMatrix(glm::mat4 projection)
 
 void Renderer::updateViewMatrix(glm::mat4 view)
 {
-	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices); // CRASH this causes access violation
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
 	glBufferSubData(
 		GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);

@@ -54,6 +54,7 @@ private:
 	void updateProjectionMatrix(glm::mat4 projection);
 	void updateViewMatrix(glm::mat4 view);
 
+
 	GLuint uboMatrices;
 	// store the textures currently loaded in the GPU to know not to make duplicates
 	// the int keeps track of how many instance are kept. when it hits 0, the texture is unloaded
@@ -67,3 +68,4 @@ private:
 
 	MaterialBasicUploader materialBasicUploader;
 };
+
