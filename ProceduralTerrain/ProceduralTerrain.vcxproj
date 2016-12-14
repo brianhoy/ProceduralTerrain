@@ -131,6 +131,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CubeGeometry.h" />
     <ClInclude Include="Directions.h" />
+    <ClInclude Include="Frustum.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="InputManager.h" />
