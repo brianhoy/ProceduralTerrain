@@ -43,8 +43,12 @@ void Game::addTestMeshes() {
 	//model.setPosition(glm::vec3(-1.0f, 0.0f, 0.0f));
 	model->setScale(glm::vec3(0.03f, 0.03f, 0.03f));
 
+	Terrain terrain = Terrain(5000, 2, 2);
+	terrain.createTiles();
 	//scene.add(testmesh2);
 	//scene.add(testmesh);
+	scene.add(terrain.tiles);
+
 	scene.add(model);
 
 

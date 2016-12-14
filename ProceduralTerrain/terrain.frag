@@ -8,5 +8,5 @@ layout (location=1) uniform int layer;
 
 void main()
 {    
-    color = texture(textureArray, vec3(TexCoords.xy, layer));
+    color = vec4(1.0f, 0.0f, 0.0f, 1.0f);//texture(textureArray, vec3(TexCoords.xy, layer));
 }

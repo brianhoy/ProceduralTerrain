@@ -6,8 +6,6 @@ private:
 	
 
 public:
-	TerrainGenerator();
-
 	void generateStaticMesh();
 };
 

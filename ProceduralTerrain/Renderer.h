@@ -39,8 +39,14 @@ private:
 	void uploadMaterial(Material* material);
 	void uploadTexture(Texture* texture);
 
+	// FIx textures being uplaoded twice and black screen
 	void bindTextures(std::vector<Texture>* textures, GLuint program);
 	void unbindTextures(std::vector<Texture> textures);
+
+	void initializeTextureArray();
+	void addTextureToTextureArray(Texture* texture);
+	void generateTextureArrayMips();
+
 
 	GLuint createProgram(std::vector<GLuint> shaders);
 	void initializeUniformBuffer();
@@ -48,11 +54,18 @@ private:
 	void updateProjectionMatrix(glm::mat4 projection);
 	void updateViewMatrix(glm::mat4 view);
 
+
 	GLuint uboMatrices;
 	// store the textures currently loaded in the GPU to know not to make duplicates
 	// the int keeps track of how many instance are kept. when it hits 0, the texture is unloaded
 	std::vector<std::pair<Texture, int>> loadedTextures = std::vector<std::pair<Texture, int>>(); 
 	std::vector<GLuint> boundTextures = std::vector<GLuint>(32);
+	// textures stored in texture array
+	std::vector<std::pair<Texture, std::string>> arrayTextures = std::vector<std::pair<Texture, std::string>>();
+
+	GLuint arrayTexture;
+	int currentSpotInArrayTexture = 0;
 
 	MaterialBasicUploader materialBasicUploader;
 };
+

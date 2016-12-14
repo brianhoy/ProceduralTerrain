@@ -45,28 +45,36 @@ int Renderer::createWindow(int width, int height)
 	glfwGetFramebufferSize(window, &vwidth, &vheight);
 	glViewport(0, 0, vwidth, vheight);
 
+	void APIENTRY glErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
+
+	glDebugMessageCallback(glErrorCallback, nullptr);
+
 	initializeUniformBuffer();
+	initializeTextureArray();
+
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-
+	glEnable(GL_DEBUG_OUTPUT);
 	return 0;
 }
 
 void Renderer::updateScene(Scene* scene) {
 	auto t_start = std::chrono::high_resolution_clock::now();
 
+	bool textures_uploaded = false; // if true, mipmaps need to be regenerated
+
 	for (int i = 0; i < scene->renderedMeshes.size(); i++) {
 		auto mesh = scene->renderedMeshes.at(i);
 		if (!mesh->noDraw) {
 			// If the geometry needs an update, upload it
 			if (mesh->geometry->needsUpdate == true) {
-				std::cout << "uploading geometry" << std::endl;
+				//std::cout << "uploading geometry" << std::endl;
 				uploadGeometry(mesh->geometry.get());
 			}
 
 			// If the material needs an update, upload it
 			if (mesh->material->needsUpdate == true) {
-				std::cout << "uploading material" << std::endl;
+				//std::cout << "uploading material" << std::endl;
 				uploadMaterial(mesh->material.get());
 				mesh->modelLocation = glGetUniformLocation(mesh->material->program, "model");
 			}
@@ -74,13 +82,18 @@ void Renderer::updateScene(Scene* scene) {
 			// If any texture needs to be uploaded, upload it
 			for (int i = 0; i < mesh->textures.size(); i++) {
 				if (mesh->textures.at(i).needsUpdate == true) {
-					std::cout << "uploading textures" << std::endl;
+					//std::cout << "uploading textures" << std::endl;
+					textures_uploaded = true;
 					uploadTexture(&mesh->textures.at(i));
 				}
 			}
 		}
 	}
 	lastVersion = scene->version;
+
+	if (textures_uploaded) {
+		generateTextureArrayMips();
+	}
 
 	auto t_end = std::chrono::high_resolution_clock::now();
 	auto loadTime = std::chrono::duration<double, std::milli>(t_end - t_start).count() / 1000.0f;
@@ -89,7 +102,7 @@ void Renderer::updateScene(Scene* scene) {
 	strs << loadTime;
 	std::string str = strs.str();
 
-	std::cout << "Total Scene Load Time: " << str;
+	std::cout << "Total Scene Load Time: " << str << std::endl;
 }
 
 void Renderer::render(Camera* camera, Scene* scene)
@@ -135,7 +148,7 @@ void Renderer::render(Camera* camera, Scene* scene)
 				mesh->lastVersionUploaded = mesh->version;
 			}
 
-			// BENCHMARK 16ms -> 0.4fps
+			// BENCHMARK 16ms -> 0.4ms
 			usePrgAndUniformTime += std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - msh_start).count();
 			msh_start = std::chrono::high_resolution_clock::now();
 
@@ -278,6 +291,8 @@ void Renderer::uploadMaterial(Material * material)
 	}
 }
 
+
+
 void Renderer::uploadTexture(Texture* texture)
 {
 	// first check if the texture already exists in GPU memory
@@ -293,15 +308,24 @@ void Renderer::uploadTexture(Texture* texture)
 	}
 	if (!found) { // new texture? upload it!
 		texture->loadImageData();
-		glGenTextures(1, &texture->textureId);
-		glBindTexture(GL_TEXTURE_2D, texture->textureId);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture->width, texture->height, 0,
-			GL_RGB, GL_UNSIGNED_BYTE, texture->image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		texture->freeImageData();
-		texture->needsUpdate = false;
 
+		if (texture->width != 1024 || texture->height != 1024) {
+			std::cout << "texture width aint 1024: " << texture->path << ", " << texture->width << "x" << texture->height << std::endl;
+
+			glGenTextures(1, &texture->textureId);
+			glBindTexture(GL_TEXTURE_2D, texture->textureId);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture->width, texture->height, 0,
+				GL_RGB, GL_UNSIGNED_BYTE, texture->image);
+			glGenerateMipmap(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			texture->freeImageData();
+		}
+		else {
+			addTextureToTextureArray(texture);
+
+		}
+
+		texture->needsUpdate = false;
 		loadedTextures.push_back(std::pair<Texture, int>(*texture, 1));
 	}
 }
@@ -312,29 +336,37 @@ void Renderer::bindTextures(std::vector<Texture>* textures, GLuint program)
 	GLuint specularNr = 1;
 
 	for (int i = 0; i < textures->size(); i++) {
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
-		//glUniform1i(glGetUniformLocation(program, "texture1"), 0);
 		if (boundTextures.at(i) == textures->at(i).textureId) {
-			continue;
+			//continue;
 		}
 
 		boundTextures.at(i) = textures->at(i).textureId;
 
-		glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
-										  // Retrieve texture number (the N in diffuse_textureN)
 		std::stringstream ss;
 		std::string number;
 		std::string name = textures->at(i).type;
-		if (name == "texture_diffuse")
-			ss << diffuseNr++; // Transfer GLuint to stream
-		else if (name == "texture_specular")
-			ss << specularNr++; // Transfer GLuint to stream
-		number = ss.str();
-		// Now set the sampler to the correct texture unit
-		glUniform1i(glGetUniformLocation(program, (name + number).c_str()), i);
-		// And finally bind the texture
-		glBindTexture(GL_TEXTURE_2D, textures->at(i).textureId);
+
+
+		if (textures->at(i).textureArrayLocation != -1) {
+			if (name == "texture_diffuse" && diffuseNr == 1)
+			{
+				glUniform1i(1, textures->at(i).textureArrayLocation);
+			}
+		}
+		else {
+			glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
+											  // Retrieve texture number (the N in diffuse_textureN)
+			if (name == "texture_diffuse")
+				ss << diffuseNr++; // Transfer GLuint to stream
+			else if (name == "texture_specular")
+				ss << specularNr++; // Transfer GLuint to stream
+			number = ss.str();
+			// Now set the sampler to the correct texture unit
+			glUniform1i(glGetUniformLocation(program, (name + number).c_str()), i);
+			// And finally bind the texture
+			glBindTexture(GL_TEXTURE_2D, textures->at(i).textureId);
+		}
+
 	}
 }
 
@@ -344,6 +376,88 @@ void Renderer::unbindTextures(std::vector<Texture> textures) {
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+}
+
+void Renderer::initializeTextureArray() {
+	std::cout << "initializing texture array" << std::endl;
+
+	glGenTextures( 1, &arrayTexture );
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, arrayTexture);
+ 
+	//Create storage for the texture. (100 layers of 1x1 texels)
+	glTexStorage3D( GL_TEXTURE_2D_ARRAY,
+				5,                    //No mipmaps as textures are 1x1
+				GL_RGB8,              //Internal format
+				1024, 1024,                 //width,height
+				100                   //Number of layers
+			);
+
+	/*GLubyte red[] = { 255, 0, 0 };
+	GLubyte green[] = { 0, 255, 0 };
+	GLubyte blue[] = { 0, 0, 255 };
+
+	glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+	0,                      //Mipmap number
+	0, 0, 0, //xoffset, yoffset, zoffset
+	1, 1, 1,          //width, height, depth
+	GL_RGB,                 //format
+	GL_UNSIGNED_BYTE,       //type
+	red); //pointer to data
+
+	glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+	0,                      //Mipmap number
+	0, 0, 1, //xoffset, yoffset, zoffset
+	1, 1, 1,          //width, height, depth
+	GL_RGB,                 //format
+	GL_UNSIGNED_BYTE,       //type
+	green); //pointer to data
+
+	glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+	0,                      //Mipmap number
+	0, 0, 2, //xoffset, yoffset, zoffset
+	1, 1, 1,          //width, height, depth
+	GL_RGB,                 //format
+	GL_UNSIGNED_BYTE,       //type
+	blue); //pointer to data */
+
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	std::cout << "done initializing texture array" << std::endl;
+}
+
+void Renderer::addTextureToTextureArray(Texture* texture)
+{
+	//if (true) return;
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, arrayTexture);
+
+	if (!texture->loaded) texture->loadImageData();
+	glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+		0,                      //Mipmap number
+		0, 0, currentSpotInArrayTexture, //xoffset, yoffset, zoffset
+		1024, 1024, 1,          //width, height, depth
+		GL_RGB,                 //format
+		GL_UNSIGNED_BYTE,       //type
+		texture->image); //pointer to data
+	texture->freeImageData();
+
+	texture->textureArrayLocation = currentSpotInArrayTexture;
+	std::cout << "added " << texture->path << " to texture array location " << texture->textureArrayLocation << std::endl;
+
+	currentSpotInArrayTexture++;
+}
+
+void Renderer::generateTextureArrayMips() {
+	glBindTexture(GL_TEXTURE_2D_ARRAY, arrayTexture);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+
+	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
 
 GLuint Renderer::createProgram(std::vector<GLuint> shaders)
@@ -371,7 +485,7 @@ void Renderer::updateProjectionMatrix(glm::mat4 projection)
 
 void Renderer::updateViewMatrix(glm::mat4 view)
 {
-	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices); // CRASH this causes access violation
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
 	glBufferSubData(
 		GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);

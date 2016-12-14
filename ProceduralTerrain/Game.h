@@ -14,7 +14,7 @@
 #include "MaterialBasic.h"
 #include "MeshCollection.h"
 #include "OBJLoader.h"
-
+#include "Terrain.h"
 // Window dimensions
 
 class Game
