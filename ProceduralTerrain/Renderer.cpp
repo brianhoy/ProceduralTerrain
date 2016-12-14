@@ -92,7 +92,7 @@ void Renderer::updateScene(Scene* scene) {
 	lastVersion = scene->version;
 
 	if (textures_uploaded) {
-		//generateTextureArrayMips();
+		generateTextureArrayMips();
 	}
 
 	auto t_end = std::chrono::high_resolution_clock::now();
@@ -387,7 +387,7 @@ void Renderer::initializeTextureArray() {
  
 	//Create storage for the texture. (100 layers of 1x1 texels)
 	glTexStorage3D( GL_TEXTURE_2D_ARRAY,
-				1,                    //No mipmaps as textures are 1x1
+				5,                    //No mipmaps as textures are 1x1
 				GL_RGB8,              //Internal format
 				1024, 1024,                 //width,height
 				100                   //Number of layers

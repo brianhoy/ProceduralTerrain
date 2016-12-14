@@ -160,5 +160,11 @@
     <None Include="meshbasic.frag">
       <Filter>Header Files\Shaders</Filter>
     </None>
+    <None Include="terrain.frag">
+      <Filter>Header Files\Shaders</Filter>
+    </None>
+    <None Include="terrain.vert">
+      <Filter>Header Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
