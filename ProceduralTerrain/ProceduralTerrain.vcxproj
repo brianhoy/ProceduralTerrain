@@ -144,6 +144,7 @@
     <ClInclude Include="MaterialBasic.h" />
     <ClInclude Include="MeshCollection.h" />
     <ClInclude Include="MeshRenderer.h" />
+    <ClInclude Include="MeshTerrain.h" />
     <ClInclude Include="Object3D.h" />
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="PlaneGeometry.h" />

@@ -14,7 +14,8 @@
 
 class Terrain {
 private:
-	float smallestTileSize;
+	float worldSize;
+	float initialScale;
 	float levels;
 	float resolution;
 	float seed;
@@ -25,22 +26,29 @@ private:
 	std::shared_ptr<MaterialBasic> material;
 	std::shared_ptr<PlaneGeometry> tileGeometry;
 public:
-	Terrain(int smallestTileSize, int levels, int resolution) :
-		smallestTileSize(smallestTileSize), levels(levels), resolution(resolution) {
+	Terrain(float worldSize, int levels, int resolution) :
+		worldSize(worldSize), levels(levels), resolution(resolution) {
+		initialScale = worldSize / std::pow(2, levels);
 
-		tileGeometry = std::make_shared<PlaneGeometry>(smallestTileSize, smallestTileSize, resolution, resolution);
+		tileGeometry = std::make_shared<PlaneGeometry>(1.0, 1.0, resolution, resolution);
 		material = std::make_shared<MaterialBasic>("terrain.frag", "terrain.vert");
 		tiles = std::make_shared<MeshCollection>();
-	}
 
-	void createTiles() {
 		glm::mat4 mat = glm::mat4();
 		glm::mat4 rotated = glm::rotate(mat, -PI / 2.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 		tileGeometry->applyMatrix(rotated);
 
+	}
+
+	void createTiles() {
+
 		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(tileGeometry, material);
 
 		tiles->meshes.push_back(mesh);
+	}
+
+	void createTile(float x, float z, int scale, int edgeMorph) {
+
 	}
 	std::shared_ptr<MeshCollection> tiles;
 };
