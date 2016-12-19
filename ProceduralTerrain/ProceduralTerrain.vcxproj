@@ -156,7 +156,9 @@
     <ClInclude Include="BasicShaderData.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainGenerator.h" />
+    <ClInclude Include="TerrainRenderer.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TileMesh.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
