@@ -144,7 +144,6 @@
     <ClInclude Include="MaterialBasic.h" />
     <ClInclude Include="MeshCollection.h" />
     <ClInclude Include="MeshRenderer.h" />
-    <ClInclude Include="MeshTerrain.h" />
     <ClInclude Include="Object3D.h" />
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="PlaneGeometry.h" />
@@ -156,9 +155,8 @@
     <ClInclude Include="BasicShaderData.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainGenerator.h" />
-    <ClInclude Include="TerrainRenderer.h" />
     <ClInclude Include="Texture.h" />
-    <ClInclude Include="TileMesh.h" />
+    <ClInclude Include="MeshTerrainTile.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

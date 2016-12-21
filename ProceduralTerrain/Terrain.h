@@ -8,7 +8,7 @@
 #include "PlaneGeometry.h"
 #include "MeshCollection.h"
 #include "MaterialBasic.h"
-#include "TileMesh.h"
+#include "MeshTerrainTile.h"
 
 #define PI 3.14159265359f
 
@@ -55,34 +55,34 @@ public:
 	void createTiles() {
 		float initialScale = worldSize / std::pow(2, levels);;
 
-		createTile(-initialScale, initialScale, initialScale, Edge::NONE);
-		createTile(-initialScale, 0, initialScale, Edge::NONE);
-		createTile(0, 0, initialScale, Edge::NONE);
-		createTile(0, -initialScale, initialScale, Edge::NONE);
+		createTile(-initialScale, initialScale, initialScale, EDGE_NONE);
+		createTile(-initialScale, 0, initialScale, EDGE_NONE);
+		createTile(0, 0, initialScale, EDGE_NONE);
+		createTile(0, -initialScale, initialScale, EDGE_NONE);
 
 		for (float scale = initialScale; scale < worldSize; scale *= 2.0f) {
-			createTile(-2 * scale, -2 * scale, scale, Edge::BOTTOM | Edge::LEFT);
-			createTile(-2 * scale, -scale, scale, Edge::LEFT);
-			createTile(-2 * scale, 0, scale, Edge::LEFT);
-			createTile(-2 * scale, scale, scale, Edge::TOP | Edge::LEFT);
+			createTile(-2 * scale, -2 * scale, scale, EDGE_BOTTOM | EDGE_LEFT);
+			createTile(-2 * scale, -scale, scale, EDGE_LEFT);
+			createTile(-2 * scale, 0, scale, EDGE_LEFT);
+			createTile(-2 * scale, scale, scale, EDGE_TOP | EDGE_LEFT);
 
-			createTile(-scale, -2 * scale, scale, Edge::BOTTOM);
+			createTile(-scale, -2 * scale, scale, EDGE_BOTTOM);
 			// 2 tiles 'missing' here are in previous layer
-			createTile(-scale, scale, scale, Edge::TOP);
+			createTile(-scale, scale, scale, EDGE_TOP);
 
-			createTile(0, -2 * scale, scale, Edge::BOTTOM);
+			createTile(0, -2 * scale, scale, EDGE_BOTTOM);
 			// 2 tiles 'missing' here are in previous layer
-			createTile(0, scale, scale, Edge::TOP);
+			createTile(0, scale, scale, EDGE_TOP);
 
-			createTile(scale, -2 * scale, scale, Edge::BOTTOM | Edge::RIGHT);
-			createTile(scale, -scale, scale, Edge::RIGHT);
-			createTile(scale, 0, scale, Edge::RIGHT);
-			createTile(scale, scale, scale, Edge::TOP | Edge::RIGHT);
+			createTile(scale, -2 * scale, scale, EDGE_BOTTOM | EDGE_RIGHT);
+			createTile(scale, -scale, scale, EDGE_RIGHT);
+			createTile(scale, 0, scale, EDGE_RIGHT);
+			createTile(scale, scale, scale, EDGE_TOP | EDGE_RIGHT);
 		}
 	}
 
 	void createTile(float x, float z, int scale, int edgeMorph) {
-		std::shared_ptr<TileMesh> mesh = std::make_shared<TileMesh>(tileGeometry, material);
+		std::shared_ptr<MeshTerrainTile> mesh = std::make_shared<MeshTerrainTile>(tileGeometry, material);
 		MeshSpecificTileUniforms uniforms = MeshSpecificTileUniforms(
 			edgeMorph, scale, glm::vec2(x, z));
 		mesh->uniforms = uniforms;

@@ -1,15 +1,13 @@
 #pragma once
 #include "Mesh.h"
 
-namespace Edge {
-	enum Edge {
-		NONE = 0,
-		TOP = 1,
-		LEFT = 2,
-		BOTTOM = 4,
-		RIGHT = 8
-	};
-}
+enum Edge {
+	EDGE_NONE = 0,
+	EDGE_TOP = 1,
+	EDGE_LEFT = 2,
+	EDGE_BOTTOM = 4,
+	EDGE_RIGHT = 8
+};
 
 struct MeshSpecificTileUniforms {
 	int edgeMorph;
@@ -21,8 +19,11 @@ struct MeshSpecificTileUniforms {
 		edgeMorph(edgeMorph), scale(scale), tileOffset(tileOffset) {}
 };
 
-class TileMesh : public Mesh {
+class MeshTerrainTile : public Mesh {
 public:
 	MeshSpecificTileUniforms uniforms;
-	bool needsUpdate = true;
+	MeshTerrainTile(std::shared_ptr<Geometry> geometry = nullptr, std::shared_ptr<Material> material = nullptr) :
+		Mesh(geometry, material) {
+		type = MESH_TILE;
+	}
 };

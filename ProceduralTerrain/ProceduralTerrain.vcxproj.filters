@@ -155,14 +155,8 @@
     <ClInclude Include="Frustum.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="MeshTerrain.h">
+    <ClInclude Include="MeshTerrainTile.h">
       <Filter>Header Files\Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="TileMesh.h">
-      <Filter>Header Files\Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="TerrainRenderer.h">
-      <Filter>Header Files\Terrain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
