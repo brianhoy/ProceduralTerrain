@@ -21,37 +21,29 @@ Game::~Game()
 
 void Game::addTestMeshes() {
 
-	std::shared_ptr<PlaneGeometry> planeGeometry = std::make_shared<PlaneGeometry>(1, 1, 10, 10);
+	std::shared_ptr<PlaneGeometry> planeGeometry = std::make_shared<PlaneGeometry>(1, 1, 100, 100);
 	std::shared_ptr<CubeGeometry> cubeGeometry = std::make_shared<CubeGeometry>();
 
 	Texture tex = Texture("../Content/container.jpg");
 	std::shared_ptr<MaterialBasic> mat = std::make_shared<MaterialBasic>();
 
-	testmesh = new Mesh(planeGeometry, mat);
-	Mesh testmesh2 = Mesh(cubeGeometry, mat);
-	//testmesh2.textures.push_back(tex);
+	std::shared_ptr<Mesh> cubeTestMesh = std::make_shared<Mesh>(cubeGeometry, mat);
+	cubeTestMesh->textures.push_back(tex);
 
 	OBJLoader loader = OBJLoader();
 	auto model = loader.loadModel("../Content/sponza/sponza.obj");
 
-	//std::cout << "mesh indices size" << testmesh->geometry->indices.size() << std::endl;
-
-	//testmesh->setScale(glm::vec3(1000.0f, 1000.0f, 1000.0f));
-
-	testmesh->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
-	//testmesh2.setScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	//model.setPosition(glm::vec3(-1.0f, 0.0f, 0.0f));
+	//cubeTestMesh->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
+	//cubeTestMesh->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	model->setScale(glm::vec3(0.03f, 0.03f, 0.03f));
 
-	Terrain terrain = Terrain(5000, 2, 2);
-	terrain.createTiles();
-	//scene.add(testmesh2);
-	//scene.add(testmesh);
-	scene.add(terrain.tiles);
-
+	//scene.add(cubeTestMesh);
 	scene.add(model);
 
 
+	//Terrain terrain = Terrain(5000, 2, 2);
+	//terrain.createTiles();
+	//scene.add(terrain.tiles);
 
 
 }

@@ -74,9 +74,9 @@ void LocalPlayer::doMovement(Direction direction, GLfloat deltaTime)
 	if (direction == BACKWARD)
 		translate(-1.0f * front * velocity);
 	if (direction == LEFT)
-		translate(-1.0f * right * velocity);
+		translate(1.0f * right * velocity);
 	if (direction == RIGHT)
-		translate(right * velocity);
+		translate(-1.0f * right * velocity);
 	if (direction == UP)
 		translate(up * velocity);
 	if (direction == DOWN)

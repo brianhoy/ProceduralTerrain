@@ -50,7 +50,7 @@ int Renderer::createWindow(int width, int height)
 	glDebugMessageCallback(glErrorCallback, nullptr);
 
 	initializeUniformBuffer();
-	initializeTextureArray();
+	//initializeTextureArray();
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -133,7 +133,6 @@ void Renderer::render(Camera* camera, Scene* scene)
 	double vrtxBindTime = 0.0f;
 
 	for (int i = 0; i < scene->renderedMeshes.size(); i++) {
-
 		auto mesh = scene->renderedMeshes.at(i);
 		if (!mesh->noDraw) {
 			auto msh_start = std::chrono::high_resolution_clock::now(); // BENCHMARK
@@ -309,8 +308,8 @@ void Renderer::uploadTexture(Texture* texture)
 	if (!found) { // new texture? upload it!
 		texture->loadImageData();
 
-		if (texture->width != 1024 || texture->height != 1024) {
-			std::cout << "texture width aint 1024: " << texture->path << ", " << texture->width << "x" << texture->height << std::endl;
+		//if (texture->width != 1024 || texture->height != 1024) {
+			std::cout << "texture width isn't 1024: " << texture->path << ", " << texture->width << "x" << texture->height << std::endl;
 
 			glGenTextures(1, &texture->textureId);
 			glBindTexture(GL_TEXTURE_2D, texture->textureId);
@@ -319,11 +318,11 @@ void Renderer::uploadTexture(Texture* texture)
 			glGenerateMipmap(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, 0);
 			texture->freeImageData();
-		}
+		/*}
 		else {
 			addTextureToTextureArray(texture);
 
-		}
+		}*/
 
 		texture->needsUpdate = false;
 		loadedTextures.push_back(std::pair<Texture, int>(*texture, 1));
@@ -337,23 +336,25 @@ void Renderer::bindTextures(std::vector<Texture>* textures, GLuint program)
 
 	for (int i = 0; i < textures->size(); i++) {
 		if (boundTextures.at(i) == textures->at(i).textureId) {
-			//continue;
+			continue;
 		}
 
 		boundTextures.at(i) = textures->at(i).textureId;
+		glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding	
+
 
 		std::stringstream ss;
 		std::string number;
 		std::string name = textures->at(i).type;
 
 
-		if (textures->at(i).textureArrayLocation != -1) {
+		/*if (textures->at(i).textureArrayLocation != -1) {
 			if (name == "texture_diffuse" && diffuseNr == 1)
 			{
 				glUniform1i(1, textures->at(i).textureArrayLocation);
 			}
 		}
-		else {
+		else {*/
 			glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
 											  // Retrieve texture number (the N in diffuse_textureN)
 			if (name == "texture_diffuse")
@@ -365,7 +366,7 @@ void Renderer::bindTextures(std::vector<Texture>* textures, GLuint program)
 			glUniform1i(glGetUniformLocation(program, (name + number).c_str()), i);
 			// And finally bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures->at(i).textureId);
-		}
+		/*}*/
 
 	}
 }

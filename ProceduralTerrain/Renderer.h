@@ -14,7 +14,6 @@
 #include "InputReceiverInterface.h"
 #include "MaterialBasicUploader.h"
 #include "MeshCollection.h"
-#include "TerrainRenderer.h"
 
 class Renderer
 {

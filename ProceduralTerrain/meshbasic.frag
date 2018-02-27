@@ -3,10 +3,10 @@
 in vec2 TexCoords;
 out vec4 color;
 
-uniform sampler2DArray textureArray;
-layout (location=1) uniform int layer;
+uniform sampler2D texture_diffuse1;
+//layout (location=1) uniform int layer;
 
 void main()
 {    
-    color = texture(textureArray, vec3(TexCoords.xy, layer));
+	color = vec4(texture(texture_diffuse1, TexCoords));	
 }

@@ -20,7 +20,9 @@ public:
 	long version = 0;
 
 	void add(std::shared_ptr<Mesh> mesh) {
+		std::cout << "Adding mesh to scene..." << std::endl;
 		meshCollections.front()->meshes.push_back(mesh);
+		renderedMeshes.push_back(mesh);
 		version++;
 	}
 
